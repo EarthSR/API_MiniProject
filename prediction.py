@@ -7,7 +7,7 @@ import os
 app = Flask(__name__)
 
 # Path where the model and labels are stored
-MODEL_PATH = 'star-model.h5'
+MODEL_PATH = 'model.h5'
 LABELS_PATH = 'star-labels.txt'
 
 # Load the trained model
@@ -18,16 +18,19 @@ class_labels = []
 with open(LABELS_PATH, "r", encoding="utf-8") as file:
     class_labels = [line.strip() for line in file]
 
-
 # Route to handle image uploads and predictions
 @app.route('/predict', methods=['POST'])
 def predict():
     if 'image' not in request.files:
         return jsonify({"error": "No image file provided"}), 400
-    
+
     # Get the image from the request
     file = request.files['image']
     filename = secure_filename(file.filename)
+
+    # Create the 'uploads' folder if it doesn't exist
+    if not os.path.exists('uploads'):
+        os.makedirs('uploads')
 
     # Save the uploaded image to a temporary directory
     file_path = os.path.join('uploads', filename)
@@ -54,10 +57,11 @@ def predict():
 
     return jsonify(result), 200
 
+
 # Start the Flask app
 if __name__ == '__main__':
     # Create the 'uploads' folder if it doesn't exist
     if not os.path.exists('uploads'):
         os.makedirs('uploads')
 
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
