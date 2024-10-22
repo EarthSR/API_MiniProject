@@ -1,4 +1,3 @@
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -12,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 
 const defaultTheme = createTheme();
 
-export default function SignInAdmin() {
+export default function SigninAdmin() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate(); 
@@ -43,15 +42,14 @@ export default function SignInAdmin() {
       console.log(err);
       alert('เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์');
     }
-};
-
+  };
 
   return (
     <ThemeProvider theme={defaultTheme}>
       <Box
         sx={{
           minHeight: '100vh',
-          backgroundColor: '#f8d7da', // สีพื้นหลังตามภาพ
+          backgroundColor: '#faf5f5', // สีพื้นหลังอ่อนๆ
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -61,19 +59,18 @@ export default function SignInAdmin() {
           <CssBaseline />
           <Box
             sx={{
-              marginTop: 8,
+              mt: 10,  // เพิ่ม margin-top 100px
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               width: '100%',
-              backgroundColor: '#ffffff',  // สีพื้นกล่องกรอกข้อมูล
               padding: 4,
-              borderRadius: '16px',  // ปรับขอบให้มนขึ้น
-              boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)', // เงาของกล่อง
+              borderRadius: '16px',
+              boxShadow: 'none', // ลบเงาของกล่องและพื้นหลังสีขาว
             }}
           >
             <Typography component="h1" variant="h4" sx={{ fontWeight: 'bold', mb: 3, color: '#333' }}>
-              MiniProjectFinal
+              Who Are You ?
             </Typography>
 
             <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1, width: '100%' }}>
@@ -88,14 +85,15 @@ export default function SignInAdmin() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 sx={{
-                  backgroundColor: '#fff8f0',  // สีพื้นหลังกล่องข้อความ
+                  backgroundColor: '#ffffff',  // สีพื้นหลังกล่องข้อความ
                   mb: 2,
-                  boxShadow: 'none',
                   borderRadius: '8px',
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': {
                       borderColor: '#000000', // ขอบกล่องข้อความเป็นสีดำ
-                      borderRadius: '8px',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#FF69B4',  // สีขอบเมื่อ hover เป็นสีชมพู
                     },
                   },
                 }}
@@ -115,14 +113,15 @@ export default function SignInAdmin() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 sx={{
-                  backgroundColor: '#fff8f0',  // สีพื้นหลังกล่องข้อความ
+                  backgroundColor: '#ffffff',  // สีพื้นหลังกล่องข้อความ
                   mb: 2,
-                  boxShadow: 'none',
                   borderRadius: '8px',
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': {
                       borderColor: '#000000',  // ขอบกล่องข้อความเป็นสีดำ
-                      borderRadius: '8px',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#FF69B4',  // สีขอบเมื่อ hover เป็นสีชมพู
                     },
                   },
                 }}
@@ -137,14 +136,17 @@ export default function SignInAdmin() {
                 sx={{
                   mt: 3,
                   mb: 2,
-                  backgroundColor: '#fcebb6',  // สีปุ่มเป็นสีเหลืองอ่อน
-                  color: 'black',
+                  backgroundColor: '#FFE5EC',  // พื้นหลังปุ่มเป็นสีชมพูอ่อน
+                  color: '#FB6F92',  // ตัวอักษรสีชมพูเข้ม
+                  border: '2px solid #F694C1',  // ขอบปุ่มสีชมพูอ่อน
                   padding: '12px',
-                  borderRadius: '8px',
+                  borderRadius: '8px', // ขอบมนของปุ่ม
                   fontWeight: 'bold',
                   fontSize: '16px',
-                  width: '100%',
-                  boxShadow: '0px 6px 12px rgba(0, 0, 0, 0.1)', // เงาปุ่ม
+                  boxShadow: 'none', // ไม่มีเงาปุ่ม
+                  '&:hover': {
+                    backgroundColor: '#ffccd5', // สีพื้นหลังเมื่อ hover
+                  },
                 }}
               >
                 เข้าสู่ระบบ

@@ -1,109 +1,120 @@
-import * as React from 'react';
-import { useState } from 'react';
-import { AppBar, Toolbar, Typography, Button, Container, Box, Card, CardContent } from '@mui/material';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { useNavigate } from 'react-router-dom'; // นำเข้า useNavigate
+import React, { useState } from 'react';
+import { Container, Box, Card, CardContent, Button, IconButton } from '@mui/material';
+import { PhotoLibrary } from '@mui/icons-material'; // ไอคอนรูปภาพ
+import { useNavigate } from 'react-router-dom'; // นำเข้า useNavigate จาก react-router-dom
+import webbg from './image/webbg.png'; // นำเข้าภาพพื้นหลัง
+import starImage from './image/star.png'; // นำเข้าภาพ star
 
-const defaultTheme = createTheme({
-  palette: {
-    mode: 'light',
-    primary: {
-      main: '#1976d2', // สีหลักของธีม
-    },
-    secondary: {
-      main: '#ff4081', // สีรองที่เด่นชัด
-    },
-  },
-  typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif', // ฟอนต์เริ่มต้น
-  },
-});
-
-export default function PredictApp() {
-  const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
-  const navigate = useNavigate(); // สร้างตัวแปร navigate สำหรับการนำทาง
+export default function Minipage() {
+  const [imagePreviewUrl, setImagePreviewUrl] = useState(null); // สถานะเพื่อเก็บ URL ของภาพที่อัปโหลด
+  const navigate = useNavigate(); // ใช้ useNavigate เพื่อเปลี่ยนหน้า
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
 
-    // สร้าง preview URL สำหรับแสดงภาพ
     const reader = new FileReader();
     reader.onloadend = () => {
-      setImagePreviewUrl(reader.result);
+      setImagePreviewUrl(reader.result); // เก็บ URL ของภาพที่อัปโหลด
     };
     reader.readAsDataURL(file);
   };
 
-  // ฟังก์ชันนำทางไปยังหน้า signinadmin
-  const handleLogin = () => {
-    navigate('/signinadmin'); // นำทางไปยังหน้า signinadmin
+  const handlePredict = () => {
+    navigate('/next1', { state: { image: imagePreviewUrl } }); // ส่งข้อมูลรูปภาพไปยังหน้า Next1
   };
 
   return (
-    <ThemeProvider theme={defaultTheme}>
-      <Box sx={{ flexGrow: 1 }}>
-        <AppBar position="static">
-          <Toolbar>
-            {/* ข้อความ whoami ที่เด่นชัดและฟอนต์สวย */}
-            <Typography
-              variant="h4" // ปรับขนาดฟอนต์ให้ใหญ่
-              component="div"
+    <Box
+      sx={{
+        minHeight: '100vh',
+        backgroundImage: `url(${webbg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        display: 'flex',
+        justifyContent: 'center', // จัดกลางแนวนอน
+        alignItems: 'center',
+        padding: '20px',
+        position: 'relative',
+      }}
+    >
+      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+        <Box display="flex" flexDirection="row" alignItems="center" justifyContent="space-between"> {/* จัดเรียงให้เป็นแถว */}
+          {/* กล่องสำหรับอัปโหลดรูป */}
+          <Box display="flex" flexDirection="column" alignItems="flex-start" sx={{ marginRight: 4 }}>
+            <Card
               sx={{
-                flexGrow: 1,
-                fontWeight: 'bold', // ทำตัวหนา
-                color: '#fff', // ใช้สีขาวให้เข้ากับพื้นหลังของ AppBar
-                textShadow: '2px 2px 4px rgba(0,0,0,0.5)', // เพิ่มเงาเพื่อให้ข้อความดูเด่น
-                fontFamily: '"Courier New", Courier, monospace', // เปลี่ยนฟอนต์ให้มีลักษณะพิเศษ
+                width: 350,
+                height: 350,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: '#f5f5f5', // พื้นหลังของกล่องสีเทาอ่อน
+                borderRadius: '10px',
+                boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+                border: '2px solid #000', // กรอบสีดำ
+                marginBottom: 2, // เพิ่มระยะห่างด้านล่าง
+                position: 'relative', // ให้ position เป็น relative เพื่อให้จัดการตำแหน่งภาพที่อัปโหลดได้
               }}
             >
-              whoami
-            </Typography>
-            <Box>
+              <CardContent sx={{ textAlign: 'center' }}>
+                <IconButton color="primary" aria-label="upload picture" component="label">
+                  <input hidden accept="image/*" type="file" onChange={handleImageChange} />
+                  {imagePreviewUrl ? (
+                    <img
+                      src={imagePreviewUrl}
+                      alt="Preview"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover', // ปรับการแสดงผลให้พอดีกับกล่อง
+                        borderRadius: '10px', // ขอบมนสำหรับภาพที่อัปโหลด
+                      }}
+                    />
+                  ) : (
+                    <PhotoLibrary sx={{ fontSize: 50 }} /> // ไอคอนรูปภาพขนาดใหญ่
+                  )}
+                </IconButton>
+              </CardContent>
+            </Card>
+
+            {/* ปุ่มทำนาย */}
+            {imagePreviewUrl && ( // ตรวจสอบว่ามีการเลือกรูปภาพแล้วหรือไม่
               <Button
                 variant="contained"
                 color="secondary"
                 sx={{
+                  width: '100%', // ให้ปุ่มกว้างเต็ม
                   fontWeight: 'bold',
-                  fontSize: '16px',
+                  padding: '10px 20px',
+                  borderRadius: '10px', // ขอบมน
+                  backgroundColor: '#FEFFDA', // สีพื้นหลังปุ่ม
+                  color: '#000', // สีตัวอักษร
+                  border: '1px solid #000', // กรอบสีดำ
                 }}
-                onClick={handleLogin} // เมื่อกดปุ่มจะเรียกฟังก์ชัน handleLogin
+                onClick={handlePredict} // เรียกใช้ฟังก์ชัน handlePredict เมื่อคลิกปุ่ม
               >
-                เข้าสู่ระบบ
+                ทำนาย
               </Button>
-            </Box>
-          </Toolbar>
-        </AppBar>
-
-        <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
-          <Box display="flex" flexDirection="column" alignItems="center">
-            <Typography variant="h5" component="div" gutterBottom>
-              ระบบอัปโหลดรูปภาพ
-            </Typography>
-
-            <Card sx={{ width: '100%' }}>
-              <CardContent>
-                <Typography variant="h6" component="div">
-                  อัปโหลดรูปภาพ
-                </Typography>
-                <input type="file" onChange={handleImageChange} style={{ marginTop: '10px', marginBottom: '10px' }} />
-
-                {/* แสดง preview รูปภาพ */}
-                {imagePreviewUrl && (
-                  <Box sx={{ textAlign: 'center', mb: 2 }}>
-                    <img src={imagePreviewUrl} alt="Preview" style={{ maxWidth: '100%', height: 'auto', marginTop: '10px' }} />
-                  </Box>
-                )}
-
-                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
-                  <Button variant="contained" color="primary">
-                    ถัดไป
-                  </Button>
-                </Box>
-              </CardContent>
-            </Card>
+            )}
           </Box>
-        </Container>
-      </Box>
-    </ThemeProvider>
+
+          {/* แสดงกรอบรูป star ขวามือกลางๆ */}
+          <Box
+            sx={{
+              width: 'auto', // ใช้ขนาดตามต้นฉบับ
+              height: 'auto', // ใช้ขนาดตามต้นฉบับ
+              display: 'flex',
+              justifyContent: 'center', // จัดกลางแนวนอน
+              alignItems: 'center',
+              overflow: 'hidden', // ไม่ให้แสดงเกินกรอบ
+              maxWidth: '600px', // กำหนดขนาดสูงสุด
+              maxHeight: '600px', // กำหนดขนาดสูงสุด
+            }}
+          >
+            <img src={starImage} alt="Star" style={{ width: '100%', height: '100%', objectFit: 'contain' }} /> {/* กรอบรูป star */}
+          </Box>
+        </Box>
+      </Container>
+    </Box>
   );
 }

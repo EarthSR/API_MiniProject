@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Typography, Avatar, Button, ButtonGroup, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Box, Container, Grid, Card, CardContent, Drawer, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import { Typography, Avatar, Button, ButtonGroup, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Box, Container, Grid, Card, CardContent } from '@mui/material';
 import { BarChart, Bar, CartesianGrid, XAxis, YAxis, Tooltip, LineChart, Line, ResponsiveContainer } from 'recharts';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Home as HomeIcon, People as PeopleIcon, Settings as SettingsIcon } from '@mui/icons-material';
 
 const url = process.env.REACT_APP_BASE_URL;
 const token = localStorage.getItem('token');
@@ -106,62 +105,8 @@ export default function Dashboard() {
     });
   };
 
-  const drawerWidth = 240;
-  const menuItems = [
-    { text: 'จัดการข้อมูลผู้ใช้', action: () => navigate('/admin/user'), icon: <PeopleIcon /> },
-    { text: 'จัดการข้อมูลพนักงาน', action: () => navigate('/admin/employee'), icon: <SettingsIcon /> },
-    { text: 'เพิ่มผู้ดูแล', action: () => navigate('/addEmployee'), icon: <SettingsIcon /> },
-    { text: 'เพิ่มความชอบ', action: () => navigate('/managepreferences'), icon: <SettingsIcon /> },
-    { text: 'ออกจากระบบ', action: handleLogout, icon: <HomeIcon /> }
-  ];
-
   return (
-    <Box sx={{ display: 'flex', backgroundColor: '#F8E9F0' }}>
-      {/* Sidebar */}
-      <Drawer
-        variant="permanent"
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          '& .MuiDrawer-paper': {
-            width: drawerWidth,
-            backgroundColor: '#f8e9f0',
-            borderRight: '0px solid #e0e0e0',
-            paddingTop: '48px',
-            paddingLeft: '25px'
-          },
-        }}
-      >
-        <Box sx={{ overflow: 'auto' }}>
-          <List>
-            {menuItems.map((item, index) => (
-              <ListItem
-                button
-                key={item.text}
-                onClick={item.action}
-                sx={{
-                  padding: '15px 20px',
-                  backgroundColor: '#f9f9f9',
-                  borderRadius: '10px',
-                  border: '2px solid black',
-                  boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
-                  marginBottom: '10px',
-                  '&:hover': {
-                    backgroundColor: '#f8e9f0',
-                    color: '#fff',
-                    boxShadow: '0 4px 12px rgba(255, 105, 180, 0.4)',
-                    borderColor: '#ff69b4',
-                  },
-                }}
-              >
-                <ListItemIcon sx={{ color: '#000' }}>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.text} sx={{ color: '#000' }} />
-              </ListItem>
-            ))}
-          </List>
-        </Box>
-      </Drawer>
-
+    <Box sx={{ display: 'flex', backgroundColor: '#F8E9F0', minHeight: '100vh' }}>
       {/* Main Content */}
       <Box
         component="main"
@@ -169,7 +114,6 @@ export default function Dashboard() {
           flexGrow: 1,
           padding: 3,
           backgroundColor: '#F8E9F0',
-          minHeight: '100vh',
         }}
       >
         <Container maxWidth="lg" sx={{ mt: 4 }}>
@@ -224,7 +168,7 @@ export default function Dashboard() {
                 <TableHead>
                   <TableRow>
                     <TableCell align="center" sx={{ padding: '16px', width: 100 }}>รหัส</TableCell>
-                    <TableCell align="center" sx={{ padding: '16px', width: 100 }}>รูป</TableCell> {/* ปรับให้เว้นระยะและสอดคล้องกับขนาดของรูปภาพ */}
+                    <TableCell align="center" sx={{ padding: '16px', width: 100 }}>รูป</TableCell>
                     <TableCell align="left" sx={{ padding: '16px' }}>ชื่อผู้ใช้</TableCell>
                     <TableCell align="left" sx={{ padding: '16px' }}>เหตุผล</TableCell>
                     <TableCell align="center" sx={{ padding: '16px' }}>จัดการข้อมูล</TableCell>

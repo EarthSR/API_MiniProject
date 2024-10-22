@@ -1,9 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mysql = require('mysql2');
-const app = express();
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const util = require('util');
 const cors = require('cors');
+const SECRET_KEY = 'UX23Y24%@&2aMb';
+const app = express();
 app.use(bodyParser.json());
 
 // MySQL connection
@@ -14,15 +17,17 @@ const db = mysql.createConnection({
     database: 'db_miniprojectfinal'  // replace with your database name
 });
 
-const query = util.promisify(db.query).bind(db);  // เปลี่ยน db.query ให้ใช้ async/await ได้
-app.use(express.json());
-app.use(cors());
-
-
 db.connect((err) => {
     if (err) throw err;
     console.log('Connected to the database');
 });
+
+db.connect();
+const query = util.promisify(db.query).bind(db);  // เปลี่ยน db.query ให้ใช้ async/await ได้
+
+// Middleware
+app.use(express.json());
+app.use(cors());
 
 
 // Login API
@@ -68,7 +73,18 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-/////////////////////////////////////////////////////////// React ///////////////////////////////////////////////////////////
+// Logout API
+app.post('/api/logout', (req, res) => {
+    res.send({ status: true, message: 'Logout successful' });
+});
+
+
+
+
+/////////////////////////////////////// React ///////////////////////////////////////
+
+
+
 
 // -------- ROUTES --------
 
