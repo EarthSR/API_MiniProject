@@ -154,15 +154,39 @@ app.get('/similarity', (req, res) => {
     });
 });
 
-// Add a similarity record
-app.post('/similarity', (req, res) => {
-    const { similarity_Date, similarityDetail_userimage, similarityDetail_Percent, ThaiCelebrities_ID } = req.body;
-    const sql = 'INSERT INTO similarity (similarity_Date, similarityDetail_userimage, similarityDetail_Percent, ThaiCelebrities_ID) VALUES (?, ?, ?, ?)';
-    db.query(sql, [similarity_Date, similarityDetail_userimage, similarityDetail_Percent, ThaiCelebrities_ID], (err, result) => {
-        if (err) throw err;
-        res.send('Similarity record added!');
-    });
+// เพิ่ม similarity record หลังจากแปลงชื่อเป็น ID แล้ว
+app.post('/similarity', async (req, res) => {
+    const { similarity_Date, similarityDetail_Percent, celebrityName } = req.body;
+
+    if (!celebrityName) {
+        return res.status(400).json({ error: 'Celebrity name is missing' });
+    }
+
+    try {
+        // เรียกใช้ API เพื่อแปลงชื่อเป็น ThaiCelebrities_ID
+        const sql = 'SELECT ThaiCelebrities_ID FROM thaicelebrities WHERE ThaiCelebrities_name = ?';
+        const results = await query(sql, [celebrityName]);
+
+        if (results.length > 0) {
+            const ThaiCelebrities_ID = results[0].ThaiCelebrities_ID;
+
+            // เมื่อได้ ThaiCelebrities_ID แล้ว จะบันทึกลง similarity table
+            const insertSql = 'INSERT INTO similarity (similarity_Date, similarityDetail_Percent, ThaiCelebrities_ID) VALUES (?, ?, ?)';
+            db.query(insertSql, [similarity_Date, similarityDetail_Percent, ThaiCelebrities_ID], (err, result) => {
+                if (err) throw err;
+                res.send('Similarity record added!');
+            });
+        } else {
+            res.status(404).json({ error: 'Celebrity not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 });
+
+
+
+
 
 // Get all age records
 app.get('/age', (req, res) => {
@@ -182,6 +206,8 @@ app.post('/age', (req, res) => {
         res.send('Age record added!');
     });
 });
+
+
 
 // -------- START SERVER --------
 const port = 3000;
