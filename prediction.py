@@ -7,17 +7,17 @@ import os
 app = Flask(__name__)
 
 # Path where the model and labels are stored
-MODEL_PATH = 'model.h5'
-LABELS_PATH = 'labels.txt'
+MODEL_PATH = 'star-model.h5'
+LABELS_PATH = 'star-labels.txt'
 
 # Load the trained model
 model = tf.keras.models.load_model(MODEL_PATH)
 
 # Load class labels
 class_labels = []
-with open(LABELS_PATH, "r") as file:
-    for line in file:
-        class_labels.append(line.strip())
+with open(LABELS_PATH, "r", encoding="utf-8") as file:
+    class_labels = [line.strip() for line in file]
+
 
 # Route to handle image uploads and predictions
 @app.route('/predict', methods=['POST'])
