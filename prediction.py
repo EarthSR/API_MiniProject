@@ -17,9 +17,16 @@ model = tf.keras.models.load_model(MODEL_PATH)
 
 # Load class labels
 class_labels = []
-with open(LABELS_PATH, "r") as file:
-    for line in file:
-        class_labels.append(line.strip())
+with open(LABELS_PATH, "r", encoding="utf-8") as file:
+    class_labels = [line.strip() for line in file]
+
+# Connect to MySQL database
+db = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="1234",  # Replace with your MySQL password
+    database="db_miniprojectfinal"  # Replace with your database name
+)
 
 # Route to handle image uploads and predictions
 @app.route('/predict', methods=['POST'])
