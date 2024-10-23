@@ -70,16 +70,18 @@ export default function CustomPage() {
               width: '100%',
               maxWidth: '900px',
               marginBottom: 4,
+              flexDirection: { xs: 'column', md: 'row' }, // แสดงเป็นแนวตั้งในมือถือ
+              alignItems: 'center',
             }}
           >
             <Button
               variant="contained"
               sx={{
                 borderRadius: '30px',
-                padding: '25px',
-                width: '400px',
-                height: '90px',
-                fontSize: '20px',
+                padding: '20px', // ลดขนาด padding ให้เหมาะกับจอมือถือ
+                width: { xs: '100%', md: '400px' }, // ปรับขนาดปุ่มให้เต็มจอในมือถือ
+                height: '70px', // ลดความสูงปุ่มสำหรับมือถือ
+                fontSize: '16px', // ลดขนาดตัวอักษรให้เหมาะสม
                 fontWeight: 'bold',
                 backgroundColor: '#FEFFDA',
                 color: 'black',
@@ -90,6 +92,7 @@ export default function CustomPage() {
                   backgroundColor: '#ffeb3b',
                   transform: 'scale(1.05)',
                 },
+                marginBottom: { xs: '20px', md: '0' }, // เพิ่ม margin สำหรับมือถือ
               }}
               onClick={handleFacePrediction}
             >
@@ -100,10 +103,10 @@ export default function CustomPage() {
               variant="contained"
               sx={{
                 borderRadius: '30px',
-                padding: '25px',
-                width: '400px',
-                height: '90px',
-                fontSize: '20px',
+                padding: '20px',
+                width: { xs: '100%', md: '400px' }, // ปรับขนาดปุ่มให้เต็มจอในมือถือ
+                height: '70px', // ลดความสูงปุ่มสำหรับมือถือ
+                fontSize: '16px', // ลดขนาดตัวอักษร
                 fontWeight: 'bold',
                 backgroundColor: '#FEFFDA',
                 color: 'black',
@@ -125,22 +128,23 @@ export default function CustomPage() {
             variant="contained"
             sx={{
               borderRadius: '30px',
-              padding: '25px',
-              width: '400px',
-              height: '90px',
-              fontSize: '20px',
+              padding: '20px',
+              width: { xs: '100%', md: '400px' }, // ปรับขนาดปุ่มให้เต็มจอในมือถือ
+              height: '70px', // ลดความสูงปุ่มสำหรับมือถือ
+              fontSize: '16px', // ลดขนาดตัวอักษร
               fontWeight: 'bold',
               backgroundColor: '#FEFFDA',
               color: 'black',
               border: '2px solid #000',
               boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
               position: 'relative',
-              bottom: '-150px',
+              bottom: { xs: '0', md: '-150px' }, // ปรับตำแหน่งให้เหมาะกับจอมือถือ
               transition: 'transform 0.2s ease-in-out',
               '&:hover': {
                 backgroundColor: '#ffeb3b',
                 transform: 'scale(1.05)',
               },
+              marginTop: { xs: '20px', md: '0' }, // เพิ่ม margin ในมือถือ
             }}
             onClick={() => navigate(-1)}
           >

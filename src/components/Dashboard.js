@@ -2,7 +2,6 @@ import React from 'react';
 import { Box, Container, Grid, Typography, Card, CardContent } from '@mui/material';
 import { BarChart, Bar, CartesianGrid, XAxis, YAxis, Tooltip, LineChart, Line, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
 
-// ข้อมูลที่ใช้ในกราฟต่าง ๆ
 const data = [
   { name: 'Jan', sessions: 28 },
   { name: 'Feb', sessions: 53 },
@@ -37,12 +36,12 @@ const areaData = [
 
 export default function Dashboard() {
   return (
-    <Box sx={{ display: 'flex', backgroundColor: '#F8E9F0', height: '100vh', overflow: 'hidden', paddingTop: '80px' }}> {/* ล็อกการเลื่อน */}
+    <Box sx={{ display: 'flex', backgroundColor: '#F8E9F0', minHeight: '100vh', overflow: 'hidden', paddingTop: '80px' }}> {/* ล็อกการเลื่อน */}
       <Box component="main" sx={{ flexGrow: 1, padding: 3, backgroundColor: '#F8E9F0' }}>
         <Container maxWidth="lg" sx={{ mt: 4 }}>
-          <Grid container spacing={4}>
+          <Grid container spacing={4}> {/* เพิ่ม spacing ให้มากขึ้นเพื่อให้การ์ดห่างกัน */}
             {/* การ์ดแสดงกราฟผู้ใช้งานใหม่ */}
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} sm={6}>
               <Card
                 sx={{
                   backgroundColor: '#fff',
@@ -50,14 +49,14 @@ export default function Dashboard() {
                   boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                   border: '2px solid black',
                   transition: 'transform 0.3s ease',
-                  '&:hover': { transform: 'scale(1.05)' }, // เอฟเฟกต์เมื่อเอาเมาส์ไปชี้
+                  '&:hover': { transform: 'scale(1.05)' },
                 }}
               >
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
                     ผู้ใช้งานใหม่
                   </Typography>
-                  <ResponsiveContainer width="100%" height={250}>
+                  <ResponsiveContainer width="100%" height={300}> {/* ปรับความสูงให้มากขึ้น */}
                     <LineChart data={data}>
                       <CartesianGrid stroke="#ccc" />
                       <XAxis dataKey="name" stroke="#000" />
@@ -71,7 +70,7 @@ export default function Dashboard() {
             </Grid>
 
             {/* การ์ดแสดงกราฟจำนวนการแมท */}
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} sm={6}>
               <Card
                 sx={{
                   backgroundColor: '#fff',
@@ -79,14 +78,14 @@ export default function Dashboard() {
                   boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                   border: '2px solid black',
                   transition: 'transform 0.3s ease',
-                  '&:hover': { transform: 'scale(1.05)' }, // เอฟเฟกต์เมื่อเอาเมาส์ไปชี้
+                  '&:hover': { transform: 'scale(1.05)' },
                 }}
               >
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
                     จำนวนการแมท
                   </Typography>
-                  <ResponsiveContainer width="100%" height={250}>
+                  <ResponsiveContainer width="100%" height={300}> {/* ปรับความสูงให้มากขึ้น */}
                     <BarChart data={pageData}>
                       <CartesianGrid stroke="#ccc" />
                       <XAxis dataKey="name" stroke="#000" />
@@ -100,7 +99,7 @@ export default function Dashboard() {
             </Grid>
 
             {/* การ์ดแสดงกราฟ Pie Chart */}
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} sm={6}>
               <Card
                 sx={{
                   backgroundColor: '#fff',
@@ -108,14 +107,14 @@ export default function Dashboard() {
                   boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                   border: '2px solid black',
                   transition: 'transform 0.3s ease',
-                  '&:hover': { transform: 'scale(1.05)' }, // เอฟเฟกต์เมื่อเอาเมาส์ไปชี้
+                  '&:hover': { transform: 'scale(1.05)' },
                 }}
               >
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
                     การใช้ระบบโดยรวม (Pie Chart)
                   </Typography>
-                  <ResponsiveContainer width="100%" height={250}>
+                  <ResponsiveContainer width="100%" height={300}> {/* ปรับความสูงให้มากขึ้น */}
                     <PieChart>
                       <Pie data={pieData} dataKey="value" cx="50%" cy="50%" outerRadius={80} fill="#8884d8" label>
                         {pieData.map((entry, index) => (
@@ -129,7 +128,7 @@ export default function Dashboard() {
             </Grid>
 
             {/* การ์ดแสดงกราฟ Area Chart */}
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} sm={6}>
               <Card
                 sx={{
                   backgroundColor: '#fff',
@@ -137,14 +136,14 @@ export default function Dashboard() {
                   boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                   border: '2px solid black',
                   transition: 'transform 0.3s ease',
-                  '&:hover': { transform: 'scale(1.05)' }, // เอฟเฟกต์เมื่อเอาเมาส์ไปชี้
+                  '&:hover': { transform: 'scale(1.05)' },
                 }}
               >
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
                     สถิติการใช้งาน (Area Chart)
                   </Typography>
-                  <ResponsiveContainer width="100%" height={250}>
+                  <ResponsiveContainer width="100%" height={300}> {/* ปรับความสูงให้มากขึ้น */}
                     <AreaChart data={areaData}>
                       <CartesianGrid stroke="#ccc" />
                       <XAxis dataKey="name" stroke="#000" />

@@ -40,8 +40,8 @@ export default function NextFace() {
       >
         <Box
           sx={{
-            width: '100%', // ครอบคลุมความกว้างหน้าจอ
-            height: '100%', // ครอบคลุมความสูงเต็มหน้าจอ
+            width: '100%',
+            height: '100%',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
@@ -59,14 +59,16 @@ export default function NextFace() {
               maxWidth: '1200px',
               textAlign: 'center',
               alignItems: 'center',
-              marginBottom: '40px', // เพิ่มระยะห่างระหว่างข้อความและปุ่ม
+              marginBottom: '40px',
+              flexDirection: { xs: 'column', md: 'row' },  // ปรับเป็นแนวตั้งบนมือถือ
+              padding: { xs: '20px', md: '0' },  // เพิ่ม padding สำหรับมือถือ
             }}
           >
             {/* ฝั่งซ้าย */}
             <Box
               sx={{
                 flex: 1,
-                paddingRight: '20px',
+                paddingRight: { xs: 0, md: '20px' }, // ปรับ padding ตามขนาดหน้าจอ
                 '&:hover': {
                   transform: 'scale(1.1)', // เพิ่มเอฟเฟกต์เมื่อชี้เมาส์
                   transition: 'transform 0.3s ease',
@@ -74,8 +76,12 @@ export default function NextFace() {
               }}
             >
               <Typography
-                variant="h2" // ขนาดใหญ่ขึ้น
-                sx={{ fontWeight: 'bold', color: '#000', fontSize: '4rem' }} // ขนาดเพิ่มขึ้น
+                variant="h2"
+                sx={{
+                  fontWeight: 'bold',
+                  color: '#000',
+                  fontSize: { xs: '2.5rem', md: '4rem' },  // ปรับขนาดตามหน้าจอ
+                }}
               >
                 คุณ
               </Typography>
@@ -85,8 +91,8 @@ export default function NextFace() {
             <Box
               sx={{
                 flex: 1,
-                paddingLeft: '20px',
-                paddingRight: '20px',
+                paddingLeft: { xs: 0, md: '20px' },
+                paddingRight: { xs: 0, md: '20px' },
                 '&:hover': {
                   transform: 'scale(1.1)', // เพิ่มเอฟเฟกต์เมื่อชี้เมาส์
                   transition: 'transform 0.3s ease',
@@ -94,12 +100,12 @@ export default function NextFace() {
               }}
             >
               <Typography
-                variant="h2" // ขนาดใหญ่ขึ้น
+                variant="h2"
                 sx={{
                   fontWeight: 'bold',
                   color: '#000',
                   marginBottom: 5,
-                  fontSize: '4rem', // ขนาดเพิ่มขึ้น
+                  fontSize: { xs: '2.5rem', md: '4rem' },  // ปรับขนาดตามหน้าจอ
                 }}
               >
                 ความเหมือน
@@ -110,7 +116,7 @@ export default function NextFace() {
                   fontWeight: 'bold',
                   color: '#ff4081',
                   textShadow: '2px 2px 5px rgba(0, 0, 0, 0.2)',
-                  fontSize: '120px', // ขนาดเพิ่มขึ้น
+                  fontSize: { xs: '60px', md: '120px' },  // ขนาดเพิ่มขึ้นสำหรับจอใหญ่
                   '&:hover': {
                     transform: 'scale(1.1)', // เพิ่มเอฟเฟกต์เมื่อชี้เมาส์
                     transition: 'transform 0.3s ease',
@@ -125,7 +131,7 @@ export default function NextFace() {
             <Box
               sx={{
                 flex: 1,
-                paddingLeft: '20px',
+                paddingLeft: { xs: 0, md: '20px' },
                 '&:hover': {
                   transform: 'scale(1.1)', // เพิ่มเอฟเฟกต์เมื่อชี้เมาส์
                   transition: 'transform 0.3s ease',
@@ -133,8 +139,12 @@ export default function NextFace() {
               }}
             >
               <Typography
-                variant="h2" // ขนาดใหญ่ขึ้น
-                sx={{ fontWeight: 'bold', color: '#000', fontSize: '4rem' }} // ขนาดเพิ่มขึ้น
+                variant="h2"
+                sx={{
+                  fontWeight: 'bold',
+                  color: '#000',
+                  fontSize: { xs: '2.5rem', md: '4rem' },  // ปรับขนาดตามหน้าจอ
+                }}
               >
                 {predicted_class}
               </Typography>
@@ -152,12 +162,12 @@ export default function NextFace() {
             <Button
               variant="contained"
               sx={{
-                borderRadius: '30px', // ขอบมนขึ้น
-                padding: '20px 60px', // เพิ่มขนาดปุ่มให้ยาวและใหญ่ขึ้น
+                borderRadius: '30px',
+                padding: { xs: '15px 40px', md: '20px 60px' },  // ปรับขนาด padding สำหรับมือถือ
                 backgroundColor: '#FEFFDA',
                 color: '#000',
                 fontWeight: 'bold',
-                fontSize: '20px',
+                fontSize: { xs: '16px', md: '20px' },  // ลดขนาดตัวอักษรสำหรับมือถือ
                 border: '2px solid #000',
                 transition: 'all 0.3s ease',
                 '&:hover': {

@@ -56,8 +56,18 @@ export default function Mainpage() {
         }}
       >
         <Container maxWidth="lg">
-          <Box display="flex" justifyContent="space-between" alignItems="center">
-            <Box display="flex" flexDirection="column" alignItems="center">
+          <Box 
+            display="flex" 
+            justifyContent="space-between" 
+            alignItems="center" 
+            sx={{ flexDirection: { xs: 'column', md: 'row' }}}  // ปรับแนวการวางให้เรียงในแนวตั้งสำหรับโทรศัพท์
+          >
+            <Box 
+              display="flex" 
+              flexDirection="column" 
+              alignItems="center" 
+              sx={{ width: { xs: '100%', md: 'auto' }}}  // ปรับขนาดของกล่องให้เต็มจอในมือถือ
+            >
               {/* ข้อความ Select Image ที่ใหญ่และโดดเด่นขึ้น */}
               <Typography
                 variant="h3" // เพิ่มขนาดใหญ่ขึ้น
@@ -66,6 +76,7 @@ export default function Mainpage() {
                   color: '#fff', // สีขาวเพื่อความชัดเจน
                   marginBottom: 3,
                   textShadow: '2px 2px 5px rgba(0, 0, 0, 0.5)', // เพิ่มเงาให้ข้อความโดดเด่น
+                  fontSize: { xs: '1.5rem', md: '3rem' }  // ปรับขนาดฟอนต์ตามขนาดหน้าจอ
                 }}
               >
                 Select Image
@@ -73,8 +84,8 @@ export default function Mainpage() {
 
               <Card
                 sx={{
-                  width: 400, // ขยายความกว้างของกล่อง
-                  height: 400, // ขยายความสูงของกล่อง
+                  width: { xs: '300px', md: '400px' }, // ปรับขนาดกล่องภาพตามขนาดหน้าจอ
+                  height: { xs: '300px', md: '400px' }, // ปรับขนาดกล่องภาพตามขนาดหน้าจอ
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center',
@@ -100,7 +111,7 @@ export default function Mainpage() {
                         }}
                       />
                     ) : (
-                      <PhotoLibrary sx={{ fontSize: 70, color: '#1976d2' }} /> // ไอคอนใหญ่ขึ้นและสีที่ชัดเจน
+                      <PhotoLibrary sx={{ fontSize: { xs: 50, md: 70 }, color: '#1976d2' }} /> // ไอคอนใหญ่ขึ้นและสีที่ชัดเจน
                     )}
                   </IconButton>
                 </CardContent>
@@ -120,12 +131,12 @@ export default function Mainpage() {
                 onClick={handlePredict}
                 sx={{
                   borderRadius: '20px',
-                  padding: '15px 30px',
+                  padding: { xs: '10px 20px', md: '15px 30px' },  // ปรับขนาดปุ่มตามหน้าจอ
                   backgroundColor: '#FEFFDA', // Yellow background color for button
                   color: '#000', // Black text color
                   border: '2px solid #000', // Black border หนาขึ้น
                   fontWeight: 'bold',
-                  fontSize: '18px', // เพิ่มขนาดตัวอักษรให้ใหญ่ขึ้น
+                  fontSize: { xs: '16px', md: '18px' }, // เพิ่มขนาดตัวอักษรให้ใหญ่ขึ้นตามขนาดหน้าจอ
                   transition: 'all 0.3s ease',
                   '&:hover': {
                     backgroundColor: '#ffcc80', // สีเมื่อ hover เปลี่ยนเป็นส้มอ่อน
@@ -140,8 +151,8 @@ export default function Mainpage() {
             {/* แสดงกรอบรูป star ขวามือ */}
             <Box
               sx={{
-                width: 'auto',
-                height: 'auto',
+                width: { xs: '200px', md: 'auto' },  // ปรับขนาดของภาพให้เหมาะสมในมือถือ
+                height: { xs: '200px', md: 'auto' }, // ปรับขนาดของภาพให้เหมาะสมในมือถือ
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
