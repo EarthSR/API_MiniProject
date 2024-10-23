@@ -15,6 +15,7 @@ CORS(app)
 # Path where the model and labels are stored
 MODEL_PATH = 'model.h5'
 LABELS_PATH = 'star-labels.txt'
+age_prediction_model = tf.keras.models.load_model('age_prediction_model_pretrained_finetuned.h5')
 
 # Load the trained model
 model = tf.keras.models.load_model(MODEL_PATH)
@@ -66,6 +67,29 @@ def predict():
     }
 
     return jsonify(result), 200
+
+
+# API endpoint to predict age
+@app.route('/predict/age', methods=['POST'])
+def predict_age():
+    # Get the image file from the request
+    if 'image' not in request.files:
+        return jsonify({'error': 'No image provided'}), 400
+
+    # Load the image from memory
+    file = request.files['image']
+    image = tf.keras.preprocessing.image.load_img(BytesIO(file.read()), target_size=(224, 224))
+    image = tf.keras.preprocessing.image.img_to_array(image)
+    image = np.expand_dims(image, axis=0)  # Add batch dimension
+    image = image / 255.0  # Rescale the image
+
+    # Make prediction using the age prediction model
+    prediction = age_prediction_model.predict(image)
+    predicted_age = float(prediction[0][0])
+
+    # Return the prediction as a JSON response
+    return jsonify({'predicted_age': predicted_age})
+
 
 # Start the Flask app
 if __name__ == '__main__':
