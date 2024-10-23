@@ -2,20 +2,21 @@ import React, { useState } from 'react';
 import { Container, Box, Card, CardContent, Button, IconButton, Typography } from '@mui/material';
 import { PhotoLibrary } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';  // นำเข้า framer-motion เพื่อเพิ่ม animation
+import { motion } from 'framer-motion';
 import webbg from './image/webbg.png';
-import starImage from './image/star.png'; // นำเข้าภาพ star
+import starImage from './image/star.png'; 
+import { useImage } from '../ImageContext'; // นำเข้า useImage
 
 export default function Mainpage() {
-  const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
-  const [imageFile, setImageFile] = useState(null);
-  const [errorMessage, setErrorMessage] = useState(''); // state สำหรับแสดงข้อความเตือน
+  const { setImageFile, imageFile } = useImage();  // ดึง setImageFile และ imageFile จาก context
+  const [imagePreviewUrl, setImagePreviewUrl] = useState(imageFile ? URL.createObjectURL(imageFile) : null);
+  const [errorMessage, setErrorMessage] = useState(''); 
   const navigate = useNavigate();
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    setImageFile(file);
-    setErrorMessage(''); // เคลียร์ข้อความเตือนเมื่อผู้ใช้เลือกไฟล์
+    setImageFile(file); // บันทึก imageFile ลง context
+    setErrorMessage(''); 
 
     const reader = new FileReader();
     reader.onloadend = () => {
@@ -26,19 +27,19 @@ export default function Mainpage() {
 
   const handlePredict = () => {
     if (!imageFile) {
-      setErrorMessage('กรุณาอัปโหลดรูปภาพก่อนทำการทำนาย!'); // แสดงข้อความเตือน
+      setErrorMessage('กรุณาอัปโหลดรูปภาพก่อนทำการทำนาย!'); 
     } else {
-      navigate('/next1', { state: { imageFile: imageFile } });
+      navigate('/next1');
     }
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}  // ค่อยๆ เพิ่ม opacity และขยายขนาดจาก 95% เป็น 100%
+      initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}  // ค่อยๆ หายไปด้วยการลดขนาดและลด opacity
-      transition={{ duration: 0.8, ease: 'easeInOut' }}  // ทำให้การเปลี่ยนแปลงลื่นไหล
-      style={{ minHeight: '100vh', overflow: 'hidden' }} // ล็อกการเลื่อนขึ้นลง
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.8, ease: 'easeInOut' }}
+      style={{ minHeight: '100vh', overflow: 'hidden' }}
     >
       <Box
         sx={{

@@ -1,28 +1,29 @@
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Box, Button } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import webbg from './image/webbg.png'; // นำเข้าภาพพื้นหลัง
-import { motion } from 'framer-motion'; // นำเข้า framer-motion
+import webbg from './image/webbg.png';
+import { motion } from 'framer-motion';
+import { useImage } from '../ImageContext'; // นำเข้า useImage
 
 const defaultTheme = createTheme({
   palette: {
     mode: 'light',
-    primary: {
-      main: '#1976d2',
-    },
-    secondary: {
-      main: '#ff4081',
-    },
+    primary: { main: '#1976d2' },
+    secondary: { main: '#ff4081' },
   },
 });
 
-export default function CustomPage() {
+export default function Next1() {
+  const { imageFile } = useImage();  // ดึง imageFile จาก context
   const navigate = useNavigate();
-  const location = useLocation();
-  const { imageFile } = location.state || {};
 
   const handleFacePrediction = async () => {
+    if (!imageFile) {
+      console.error('No image file');
+      return;
+    }
+
     const formData = new FormData();
     formData.append('image', imageFile);
 
@@ -46,7 +47,7 @@ export default function CustomPage() {
   return (
     <ThemeProvider theme={defaultTheme}>
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}  // เพิ่ม animation คล้ายหน้าอื่นๆ
+        initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ duration: 0.8, ease: 'easeInOut' }}
@@ -146,7 +147,7 @@ export default function CustomPage() {
               },
               marginTop: { xs: '20px', md: '0' }, // เพิ่ม margin ในมือถือ
             }}
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/mainpage')} // เปลี่ยนการนำทางไปยังหน้า mainpage
           >
             ย้อนกลับ
           </Button>

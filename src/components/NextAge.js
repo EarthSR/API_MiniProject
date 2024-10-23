@@ -4,6 +4,7 @@ import { Box, Button, Typography } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { motion } from 'framer-motion'; // นำเข้า framer-motion
 import webbg from './image/webbg.png';  // นำเข้าภาพพื้นหลัง
+import { useImage } from '../ImageContext'; // นำเข้า useImage จาก ImageContext
 
 const defaultTheme = createTheme({
   palette: {
@@ -19,6 +20,7 @@ const defaultTheme = createTheme({
 
 export default function ImageComparisonPage() {
   const navigate = useNavigate(); // ใช้ useNavigate เพื่อจัดการการนำทาง
+  const { imageFile } = useImage(); // ดึงข้อมูล imageFile จาก context
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -50,7 +52,7 @@ export default function ImageComparisonPage() {
             transition={{ duration: 0.8, ease: 'easeInOut' }} // ปรับให้ animation ทำงานช้าลง
           >
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 4 }}>
-              {/* รูปภาพคนเดียว */}
+              {/* รูปภาพที่ผู้ใช้อัปโหลด */} 
               <Box
                 sx={{
                   marginTop: '100px',
@@ -61,25 +63,31 @@ export default function ImageComparisonPage() {
                   boxShadow: 3,
                 }}
               >
-                <img
-                  src="/path/to/your/image1.png" // ใช้รูปตามที่กำหนด
-                  alt="person"
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                  }}
-                />
+                {imageFile ? (
+                  <img
+                    src={URL.createObjectURL(imageFile)} // ใช้รูปจาก imageFile
+                    alt="Uploaded person"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                    }}
+                  />
+                ) : (
+                  <Typography variant="h6" sx={{ textAlign: 'center', marginTop: '20px' }}>
+                    No Image Uploaded
+                  </Typography>
+                )}
               </Box>
             </Box>
           </motion.div>
 
-          {/* ส่วนที่แสดงอายุ */} 
+          {/* ส่วนที่แสดงอายุ */}
           <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
-            อายุ: <span style={{ backgroundColor: '#ffefc0', padding: '0 16px', borderRadius: '8px' }}></span>
+            อายุ: <span style={{ backgroundColor: '#ffefc0', padding: '0 16px', borderRadius: '8px' }}>N/A</span>
           </Typography>
 
-          {/* ปุ่มย้อนกลับ */} 
+          {/* ปุ่มย้อนกลับ */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}  // Animation เริ่มต้น: เลื่อนลง
             animate={{ opacity: 1, y: 0 }}   // Animation ที่จะเกิดขึ้น: กลับไปที่ตำแหน่งปกติ
@@ -104,7 +112,7 @@ export default function ImageComparisonPage() {
                     backgroundColor: '#ffd996', // สีเมื่อ hover
                   },
                 }}
-                onClick={() => navigate(-1)} // ใช้ navigate(-1) เพื่อย้อนกลับไปยังหน้าก่อนหน้า
+                onClick={() => navigate('/next1')} // ใช้ navigate('/next1') เพื่อไปยังหน้า next1
               >
                 ย้อนกลับ
               </Button>

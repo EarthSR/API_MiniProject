@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom'; // นำเข้า useNavigate และ useLocation
 import { Box, Typography, Button } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { motion } from 'framer-motion'; // นำเข้า framer-motion เพื่อเพิ่ม animation
@@ -19,7 +19,8 @@ const defaultTheme = createTheme({
 
 export default function NextFace() {
   const location = useLocation();
-  const { result } = location.state || {};
+  const navigate = useNavigate(); // ใช้ useNavigate เพื่อจัดการการนำทาง
+  const { result, imageFile } = location.state || {}; // รับ imageFile จาก state เพื่อส่งกลับหน้า next1
   const { predicted_class, confidence_score } = result || {};
 
   return (
@@ -175,7 +176,7 @@ export default function NextFace() {
                   transform: 'scale(1.05)',
                 },
               }}
-              onClick={() => window.history.back()}
+              onClick={() => navigate('/next1', { state: { imageFile } })}  // นำทางกลับไปหน้า next1 พร้อมกับส่ง imageFile กลับ
             >
               ย้อนกลับ
             </Button>
