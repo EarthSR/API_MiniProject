@@ -51,9 +51,9 @@ export default function Mainpage() {
           justifyContent: 'center',
           alignItems: 'center',
           padding: '20px',
-          position: 'fixed',  // ล็อกเนื้อหาให้อยู่ในตำแหน่งนี้
-          width: '100%',  // ใช้พื้นที่เต็มหน้าจอ
-          height: '100vh',  // ความสูงเต็มหน้าจอ
+          position: 'fixed',
+          width: '100%',
+          height: '100vh',
         }}
       >
         <Container maxWidth="lg">
@@ -71,13 +71,13 @@ export default function Mainpage() {
             >
               {/* ข้อความ Select Image ที่ใหญ่และโดดเด่นขึ้น */}
               <Typography
-                variant="h3" // เพิ่มขนาดใหญ่ขึ้น
+                variant="h3"
                 sx={{
                   fontWeight: 'bold',
-                  color: '#fff', // สีขาวเพื่อความชัดเจน
+                  color: '#fff',
                   marginBottom: 3,
-                  textShadow: '2px 2px 5px rgba(0, 0, 0, 0.5)', // เพิ่มเงาให้ข้อความโดดเด่น
-                  fontSize: { xs: '1.5rem', md: '3rem' }  // ปรับขนาดฟอนต์ตามขนาดหน้าจอ
+                  textShadow: '2px 2px 5px rgba(0, 0, 0, 0.5)',
+                  fontSize: { xs: '1.5rem', md: '3rem' },  // ปรับขนาดฟอนต์ตามขนาดหน้าจอ
                 }}
               >
                 Select Image
@@ -85,16 +85,16 @@ export default function Mainpage() {
 
               <Card
                 sx={{
-                  width: { xs: '300px', md: '400px' }, // ปรับขนาดกล่องภาพตามขนาดหน้าจอ
-                  height: { xs: '300px', md: '400px' }, // ปรับขนาดกล่องภาพตามขนาดหน้าจอ
+                  width: { xs: '300px', md: '400px' },
+                  height: { xs: '300px', md: '400px' },
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center',
-                  backgroundColor: '#fafafa', // พื้นหลังสว่างขึ้น
-                  borderRadius: '20px', // ขอบมนเพิ่มขึ้น
-                  boxShadow: '0px 6px 12px rgba(0, 0, 0, 0.2)', // เพิ่มเงาให้ดูโดดเด่น
+                  backgroundColor: '#fafafa',
+                  borderRadius: '20px',
+                  boxShadow: '0px 6px 12px rgba(0, 0, 0, 0.2)',
                   marginBottom: 3,
-                  border: '2px solid #000', // กรอบสีดำหนาขึ้น
+                  border: '2px solid #000',
                 }}
               >
                 <CardContent>
@@ -108,7 +108,7 @@ export default function Mainpage() {
                           width: '100%',
                           height: '100%',
                           objectFit: 'cover',
-                          borderRadius: '20px', // ขอบมนของภาพ
+                          borderRadius: '20px',
                         }}
                       />
                     ) : (
@@ -132,16 +132,16 @@ export default function Mainpage() {
                 onClick={handlePredict}
                 sx={{
                   borderRadius: '20px',
-                  padding: { xs: '10px 20px', md: '15px 30px' },  // ปรับขนาดปุ่มตามหน้าจอ
-                  backgroundColor: '#FEFFDA', // Yellow background color for button
-                  color: '#000', // Black text color
-                  border: '2px solid #000', // Black border หนาขึ้น
+                  padding: { xs: '10px 20px', md: '15px 30px' },
+                  backgroundColor: '#FEFFDA',
+                  color: '#000',
+                  border: '2px solid #000',
                   fontWeight: 'bold',
-                  fontSize: { xs: '16px', md: '18px' }, // เพิ่มขนาดตัวอักษรให้ใหญ่ขึ้นตามขนาดหน้าจอ
+                  fontSize: { xs: '16px', md: '18px' },
                   transition: 'all 0.3s ease',
                   '&:hover': {
-                    backgroundColor: '#ffcc80', // สีเมื่อ hover เปลี่ยนเป็นส้มอ่อน
-                    transform: 'scale(1.05)', // เพิ่มเอฟเฟกต์ขยายเล็กน้อยเมื่อ hover
+                    backgroundColor: '#ffcc80',
+                    transform: 'scale(1.05)',
                   },
                 }}
               >
@@ -149,12 +149,12 @@ export default function Mainpage() {
               </Button>
             </Box>
 
-            {/* แสดงกรอบรูป star ขวามือ */}
+            {/* แสดงกรอบรูป star ขวามือ (ซ่อนเมื่อเป็นมือถือ) */}
             <Box
               sx={{
-                width: { xs: '200px', md: 'auto' },  // ปรับขนาดของภาพให้เหมาะสมในมือถือ
-                height: { xs: '200px', md: 'auto' }, // ปรับขนาดของภาพให้เหมาะสมในมือถือ
-                display: 'flex',
+                display: { xs: 'none', md: 'flex' },  // ซ่อนรูปในหน้าจอมือถือ
+                width: { xs: '200px', md: 'auto' },
+                height: { xs: '200px', md: 'auto' },
                 justifyContent: 'center',
                 alignItems: 'center',
                 overflow: 'hidden',
