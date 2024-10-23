@@ -88,7 +88,7 @@ app.post('/api/predict', async (req, res) => {
     try {
         const formData = new FormData();
         formData.append('image', req.body.image);
-            const response = await fetch(process.env.Predict_APP_BASE_URL + '/predict', {
+            const response = await fetch(process.env.REACT_APP_PREDICT_BASE_URL + '/predict', {
             method: 'POST',
             body: formData,
         });

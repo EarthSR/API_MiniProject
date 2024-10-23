@@ -23,16 +23,23 @@ export default function Next1() {
       console.error('No image file');
       return;
     }
-
+  
     const formData = new FormData();
     formData.append('image', imageFile);
-
+  
+    const baseUrl = process.env.REACT_APP_PREDICT_BASE_URL;
+  
+    if (!baseUrl) {
+      console.error('Base URL not defined');
+      return;
+    }
+  
     try {
-      const response = await fetch('http://192.168.1.49:5000/predict', {
+      const response = await fetch(`${baseUrl}/predict`, {
         method: 'POST',
         body: formData,
       });
-
+  
       const data = await response.json();
       if (response.ok) {
         navigate('/nextface', { state: { result: data } });
@@ -43,6 +50,7 @@ export default function Next1() {
       console.error('Error:', error);
     }
   };
+  
 
   return (
     <ThemeProvider theme={defaultTheme}>
