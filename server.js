@@ -202,9 +202,6 @@ app.post('/similarity', async (req, res) => {
     }
 });
 
-
-
-
 // Get all age records
 app.get('/age', (req, res) => {
     const sql = 'SELECT * FROM age';
