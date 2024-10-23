@@ -6,10 +6,11 @@ import Next1 from './components/Next1';
 import NextFace from './components/NextFace';
 import NextAge from './components/NextAge';
 import Dashboard from './components/Dashboard';
-import SignInAdmin from './components/SigninAdmin';
+import SigninAdmin from './components/SigninAdmin';
 
+ 
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-
+ 
 const defaultTheme = createTheme({
   palette: {
     mode: 'light',
@@ -24,19 +25,19 @@ const defaultTheme = createTheme({
     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
   },
 });
-
+ 
 export default function App() {
   return (
     <ThemeProvider theme={defaultTheme}>
       <Router>
         <Header />
         <Routes>
-          <Route path="/" element={<Navigate to="/mainpage" />} /> 
+          <Route path="/" element={<Navigate to="/mainpage" />} />
           <Route exact path='/mainpage' element={<Mainpage />} />
           <Route exact path='/next1' element={<Next1/>}/>
           <Route exact path='/nextface' element={<NextFace/>}/>
           <Route exact path='/nextage' element={<NextAge/>}/>
-          <Route exact path='/signinadmin' element={<SignInAdmin/>}/>
+          <Route exact path='/signinadmin' element={<SigninAdmin/>}/>
           <Route exact path='/dashboard' element={<Dashboard/>}/>
         </Routes>
       </Router>

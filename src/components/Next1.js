@@ -1,8 +1,9 @@
-import * as React from 'react';
-import { useNavigate } from 'react-router-dom'; // นำเข้า useNavigate สำหรับการนำทาง
+import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Box, Button } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import webbg from './image/webbg.png';  // นำเข้าภาพพื้นหลัง
+import webbg from './image/webbg.png'; // นำเข้าภาพพื้นหลัง
+import { motion } from 'framer-motion'; // นำเข้า framer-motion
 
 const defaultTheme = createTheme({
   palette: {
@@ -17,92 +18,136 @@ const defaultTheme = createTheme({
 });
 
 export default function CustomPage() {
-  const navigate = useNavigate(); // ใช้ useNavigate เพื่อจัดการการนำทาง
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { imageFile } = location.state || {};
+
+  const handleFacePrediction = async () => {
+    const formData = new FormData();
+    formData.append('image', imageFile);
+
+    try {
+      const response = await fetch('http://192.168.1.49:5000/predict', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        navigate('/nextface', { state: { result: data } });
+      } else {
+        console.error('Error:', data.error);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
 
   return (
     <ThemeProvider theme={defaultTheme}>
-      <Box
-        sx={{
-          flexGrow: 1,
-          backgroundImage: `url(${webbg})`,  // ตั้งค่า background image
-          backgroundSize: 'cover',           // ปรับภาพให้ครอบคลุมเต็มพื้นที่
-          backgroundPosition: 'center',      // จัดกึ่งกลางภาพ
-          height: '100vh',                   // ความสูงเต็มหน้าจอ
-          display: 'flex',                   // จัดให้เนื้อหาอยู่กลางจอ
-          justifyContent: 'center',
-          alignItems: 'center',
-          flexDirection: 'column',
-          padding: '0 16px',                 // เพิ่ม padding ด้านข้าง
-        }}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}  // เพิ่ม animation คล้ายหน้าอื่นๆ
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.8, ease: 'easeInOut' }}
       >
-        {/* กล่องสำหรับปุ่มสองปุ่มด้านบน */}
-        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'center', gap: 2 }}>
-          {/* ปุ่มหน้าของคุณเหมือนดาราคนไหน */}
-          <Button
-            variant="contained"
+        <Box
+          sx={{
+            minHeight: '100vh',
+            backgroundImage: `url(${webbg})`,
+            backgroundSize: 'cover',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            flexDirection: 'column',
+            padding: '0 16px',
+          }}
+        >
+          <Box
             sx={{
-              borderRadius: '10px',
-              border: '1px solid #000', // เพิ่มกรอบสีดำ
-              padding: '10px',
-              width: { xs: '100%', sm: '350px' }, // ปรับความกว้างตามขนาดหน้าจอ
-              height: '70px',
-              fontSize: '16px',
-              fontWeight: 'bold',
-              backgroundColor: '#FEFFDA',  // สีพื้นหลังปุ่ม
-              color: 'black',              // สีข้อความปุ่ม
-              textAlign: 'center',         // จัดข้อความให้อยู่ตรงกลาง
-              boxShadow: 3,                // เงาของปุ่ม
+              display: 'flex',
+              justifyContent: 'space-between',
+              width: '100%',
+              maxWidth: '900px',
+              marginBottom: 4,
             }}
-            onClick={() => navigate('/nextface')}  // นำทางไปหน้า NextFace
           >
-            หน้าของคุณเหมือนดาราคนไหน
-          </Button>
+            <Button
+              variant="contained"
+              sx={{
+                borderRadius: '30px',
+                padding: '25px',
+                width: '400px',
+                height: '90px',
+                fontSize: '20px',
+                fontWeight: 'bold',
+                backgroundColor: '#FEFFDA',
+                color: 'black',
+                border: '2px solid #000',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+                transition: 'transform 0.2s ease-in-out',
+                '&:hover': {
+                  backgroundColor: '#ffeb3b',
+                  transform: 'scale(1.05)',
+                },
+              }}
+              onClick={handleFacePrediction}
+            >
+              หน้าของคุณเหมือนดาราคนไหน
+            </Button>
 
-          {/* ปุ่มคุณอายุเท่าไหร่ */}
+            <Button
+              variant="contained"
+              sx={{
+                borderRadius: '30px',
+                padding: '25px',
+                width: '400px',
+                height: '90px',
+                fontSize: '20px',
+                fontWeight: 'bold',
+                backgroundColor: '#FEFFDA',
+                color: 'black',
+                border: '2px solid #000',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+                transition: 'transform 0.2s ease-in-out',
+                '&:hover': {
+                  backgroundColor: '#ffeb3b',
+                  transform: 'scale(1.05)',
+                },
+              }}
+              onClick={() => navigate('/nextage')}
+            >
+              คุณอายุเท่าไหร่
+            </Button>
+          </Box>
+
           <Button
             variant="contained"
             sx={{
-              borderRadius: '10px',
-              border: '1px solid #000', // เพิ่มกรอบสีดำ
-              padding: '10px',
-              width: { xs: '100%', sm: '350px' }, // ปรับความกว้างตามขนาดหน้าจอ
-              height: '70px',
-              fontSize: '16px',
+              borderRadius: '30px',
+              padding: '25px',
+              width: '400px',
+              height: '90px',
+              fontSize: '20px',
               fontWeight: 'bold',
-              backgroundColor: '#FEFFDA',  // สีพื้นหลังปุ่ม
-              color: 'black',              // สีข้อความปุ่ม
-              textAlign: 'center',         // จัดข้อความให้อยู่ตรงกลาง
-              boxShadow: 3,                // เงาของปุ่ม
+              backgroundColor: '#FEFFDA',
+              color: 'black',
+              border: '2px solid #000',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+              position: 'relative',
+              bottom: '-150px',
+              transition: 'transform 0.2s ease-in-out',
+              '&:hover': {
+                backgroundColor: '#ffeb3b',
+                transform: 'scale(1.05)',
+              },
             }}
-            onClick={() => navigate('/nextage')}  // นำทางไปหน้า NextAge
-          >
-            คุณอายุเท่าไหร่
-          </Button>
-        </Box>
-
-        {/* ปุ่มย้อนกลับ */}
-        <Box sx={{ mt: 4 }}>
-          <Button
-            variant="contained"
-            sx={{
-              borderRadius: '10px',
-              border: '1px solid #000', // เพิ่มกรอบสีดำ
-              padding: '10px',
-              width: { xs: '100%', sm: '300px' }, // ปรับความกว้างตามขนาดหน้าจอ
-              height: '70px',
-              fontSize: '16px',
-              fontWeight: 'bold',
-              backgroundColor: '#FEFFDA',  // สีพื้นหลังปุ่ม
-              color: 'black',              // สีข้อความปุ่ม
-              textAlign: 'center',         // จัดข้อความให้อยู่ตรงกลาง
-              boxShadow: 3,                // เงาของปุ่ม
-            }}
-            onClick={() => navigate(-1)}  // นำทางย้อนกลับไปยังหน้าเดิม
+            onClick={() => navigate(-1)}
           >
             ย้อนกลับ
           </Button>
         </Box>
-      </Box>
+      </motion.div>
     </ThemeProvider>
   );
 }

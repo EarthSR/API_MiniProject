@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Box, Button, Typography } from '@mui/material';
+import { useLocation } from 'react-router-dom';
+import { Box, Typography, Button } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { motion } from 'framer-motion'; // นำเข้า framer-motion เพื่อเพิ่ม animation
 import webbg from './image/webbg.png';
 
 const defaultTheme = createTheme({
@@ -16,84 +17,161 @@ const defaultTheme = createTheme({
   },
 });
 
-export default function ImageComparisonPage() {
-  const navigate = useNavigate();
+export default function NextFace() {
+  const location = useLocation();
+  const { result } = location.state || {};
+  const { predicted_class, confidence_score } = result || {};
 
   return (
     <ThemeProvider theme={defaultTheme}>
-      <Box
-        sx={{
-          flexGrow: 1,
-          backgroundImage: `url(${webbg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          height: '100vh',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          flexDirection: 'column',
-          padding: '0 16px',
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}  // เพิ่ม animation คล้ายหน้าอื่นๆ
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.8, ease: 'easeInOut' }}
+        style={{
+          position: 'fixed',  // ครอบคลุมทั้งหน้าจอ
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          overflow: 'hidden',  // ป้องกันการเลื่อนขึ้นลง
         }}
       >
-        {/* กล่องสำหรับชื่อ */}
-        <Box 
-          sx={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center', 
-            width: '100%',
-            maxWidth: '1000px', // จำกัดขนาดความกว้างสูงสุด
-            mb: 4,
-            padding: '0 20px',
+        <Box
+          sx={{
+            width: '100%', // ครอบคลุมความกว้างหน้าจอ
+            height: '100%', // ครอบคลุมความสูงเต็มหน้าจอ
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundImage: `url(${webbg})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
           }}
         >
-          {/* ชื่อคนแรกอยู่ซ้าย */}
-          <Box sx={{ textAlign: 'center', flex: 1 }}>
-            <Typography variant="h4" sx={{ mb: 2 }}>
-              คุณ
-            </Typography>
-          </Box>
-
-          {/* ข้อความความเหมือนอยู่ตรงกลาง */}
-          <Box sx={{ textAlign: 'center', flex: 1 }}>
-            <Typography variant="h4" sx={{ mb: 1 }}>
-              ความเหมือน
-            </Typography>
-            <Typography variant="h3" sx={{ color: '#ff4081', fontWeight: 'bold' }}>
-              80%
-            </Typography>
-          </Box>
-
-          {/* ชื่อดาราอยู่ทางขวา */}
-          <Box sx={{ textAlign: 'center', flex: 1 }}>
-          </Box>
-        </Box>
-
-        {/* ปุ่มย้อนกลับ */}
-        <Box sx={{ mt: 2 }}>
-          <Button 
-            variant="contained" 
+          <Box
             sx={{
-              border: '1px solid #000', 
-              borderRadius: '10px', 
-              padding: '10px',
+              display: 'flex',
+              justifyContent: 'space-between',
               width: '100%',
-              maxWidth: { xs: '150px', md: '200px' }, 
-              height: '50px',
-              fontSize: '16px',
-              fontWeight: 'bold',
-              backgroundColor: '#FEFFDA',
-              color: 'black',
-              '&:hover': {
-                backgroundColor: '#ffd996',
-              },
+              maxWidth: '1200px',
+              textAlign: 'center',
+              alignItems: 'center',
+              marginBottom: '40px', // เพิ่มระยะห่างระหว่างข้อความและปุ่ม
             }}
-            onClick={() => navigate(-1)}
           >
-            ย้อนกลับ
-          </Button>
+            {/* ฝั่งซ้าย */}
+            <Box
+              sx={{
+                flex: 1,
+                paddingRight: '20px',
+                '&:hover': {
+                  transform: 'scale(1.1)', // เพิ่มเอฟเฟกต์เมื่อชี้เมาส์
+                  transition: 'transform 0.3s ease',
+                },
+              }}
+            >
+              <Typography
+                variant="h2" // ขนาดใหญ่ขึ้น
+                sx={{ fontWeight: 'bold', color: '#000', fontSize: '4rem' }} // ขนาดเพิ่มขึ้น
+              >
+                คุณ
+              </Typography>
+            </Box>
+
+            {/* กลาง */}
+            <Box
+              sx={{
+                flex: 1,
+                paddingLeft: '20px',
+                paddingRight: '20px',
+                '&:hover': {
+                  transform: 'scale(1.1)', // เพิ่มเอฟเฟกต์เมื่อชี้เมาส์
+                  transition: 'transform 0.3s ease',
+                },
+              }}
+            >
+              <Typography
+                variant="h2" // ขนาดใหญ่ขึ้น
+                sx={{
+                  fontWeight: 'bold',
+                  color: '#000',
+                  marginBottom: 5,
+                  fontSize: '4rem', // ขนาดเพิ่มขึ้น
+                }}
+              >
+                ความเหมือน
+              </Typography>
+              <Typography
+                variant="h1"
+                sx={{
+                  fontWeight: 'bold',
+                  color: '#ff4081',
+                  textShadow: '2px 2px 5px rgba(0, 0, 0, 0.2)',
+                  fontSize: '120px', // ขนาดเพิ่มขึ้น
+                  '&:hover': {
+                    transform: 'scale(1.1)', // เพิ่มเอฟเฟกต์เมื่อชี้เมาส์
+                    transition: 'transform 0.3s ease',
+                  },
+                }}
+              >
+                {confidence_score}%
+              </Typography>
+            </Box>
+
+            {/* ฝั่งขวา */}
+            <Box
+              sx={{
+                flex: 1,
+                paddingLeft: '20px',
+                '&:hover': {
+                  transform: 'scale(1.1)', // เพิ่มเอฟเฟกต์เมื่อชี้เมาส์
+                  transition: 'transform 0.3s ease',
+                },
+              }}
+            >
+              <Typography
+                variant="h2" // ขนาดใหญ่ขึ้น
+                sx={{ fontWeight: 'bold', color: '#000', fontSize: '4rem' }} // ขนาดเพิ่มขึ้น
+              >
+                {predicted_class}
+              </Typography>
+            </Box>
+          </Box>
+
+          {/* ปุ่มย้อนกลับ */}
+          <Box
+            sx={{
+              position: 'absolute',
+              bottom: '100px', // ขยับขึ้นมาเล็กน้อย
+              textAlign: 'center',
+            }}
+          >
+            <Button
+              variant="contained"
+              sx={{
+                borderRadius: '30px', // ขอบมนขึ้น
+                padding: '20px 60px', // เพิ่มขนาดปุ่มให้ยาวและใหญ่ขึ้น
+                backgroundColor: '#FEFFDA',
+                color: '#000',
+                fontWeight: 'bold',
+                fontSize: '20px',
+                border: '2px solid #000',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  backgroundColor: '#ffeb3b',
+                  transform: 'scale(1.05)',
+                },
+              }}
+              onClick={() => window.history.back()}
+            >
+              ย้อนกลับ
+            </Button>
+          </Box>
         </Box>
-      </Box>
+      </motion.div>
     </ThemeProvider>
   );
 }

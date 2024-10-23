@@ -5,8 +5,11 @@ from werkzeug.utils import secure_filename
 import os
 import mysql.connector
 from datetime import datetime
+from flask_cors import CORS
+import threading  # ใช้สำหรับทำงานหน่วงเวลา
 
 app = Flask(__name__)
+CORS(app)
 
 # Path where the model and labels are stored
 MODEL_PATH = 'model.h5'
@@ -28,6 +31,15 @@ db = mysql.connector.connect(
     database="db_miniprojectfinal"  # Replace with your database name
 )
 
+# Function to delete file after a certain time
+def delete_file_after_delay(file_path, delay):
+    def delete_file():
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            print(f"{file_path} has been deleted.")
+    timer = threading.Timer(delay, delete_file)  # Run after 'delay' seconds
+    timer.start()
+
 # Route to handle image uploads and predictions
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -46,15 +58,24 @@ def predict():
     file_path = os.path.join('uploads', filename)
     file.save(file_path)
 
+    # Schedule the file to be deleted after 180 seconds
+    delete_file_after_delay(file_path, 180)  # Delete file after 10 seconds
+
     # Preprocess the image
-    image = tf.keras.preprocessing.image.load_img(file_path, target_size=(224, 224))
-    image = tf.keras.preprocessing.image.img_to_array(image)
-    image = tf.expand_dims(image, axis=0)  # Add batch dimension
+    try:
+        image = tf.keras.preprocessing.image.load_img(file_path, target_size=(224, 224))
+        image = tf.keras.preprocessing.image.img_to_array(image)
+        image = tf.expand_dims(image, axis=0)  # Add batch dimension
+    except Exception as e:
+        return jsonify({"error": f"Error processing image: {str(e)}"}), 500
 
     # Make the prediction
-    predictions = model.predict(image, verbose=0)
-    predicted_class = int(tf.argmax(predictions, axis=1).numpy()[0])  # แปลง numpy.int64 เป็น int
-    confidence_score = predictions[0][predicted_class]
+    try:
+        predictions = model.predict(image, verbose=0)
+        predicted_class = int(tf.argmax(predictions, axis=1).numpy()[0])  # Convert numpy.int64 to int
+        confidence_score = predictions[0][predicted_class]
+    except Exception as e:
+        return jsonify({"error": f"Error during model prediction: {str(e)}"}), 500
 
     # Prepare the response
     result = {
@@ -88,12 +109,16 @@ def predict():
         cursor.execute(sql_insert_similarity, (similarity_date, similarity_percent, thai_celebrities_id))
         db.commit()
 
+    except mysql.connector.Error as err:
+        db.rollback()
+        return jsonify({"error": f"MySQL error: {str(err)}"}), 500
     except Exception as e:
         db.rollback()
         return jsonify({"error": str(e)}), 500
+    finally:
+        cursor.close()
 
     return jsonify(result), 200
-
 
 # Start the Flask app
 if __name__ == '__main__':

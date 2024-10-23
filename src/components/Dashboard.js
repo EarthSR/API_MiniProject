@@ -1,13 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { Typography, Avatar, Button, ButtonGroup, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Box, Container, Grid, Card, CardContent } from '@mui/material';
-import { BarChart, Bar, CartesianGrid, XAxis, YAxis, Tooltip, LineChart, Line, ResponsiveContainer } from 'recharts';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Box, Container, Grid, Typography, Card, CardContent } from '@mui/material';
+import { BarChart, Bar, CartesianGrid, XAxis, YAxis, Tooltip, LineChart, Line, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
 
-const url = process.env.REACT_APP_BASE_URL;
-const token = localStorage.getItem('token');
-
-// Sample data for charts
+// ข้อมูลที่ใช้ในกราฟต่าง ๆ
 const data = [
   { name: 'Jan', sessions: 28 },
   { name: 'Feb', sessions: 53 },
@@ -25,102 +20,39 @@ const pageData = [
   { name: 'Jun', views: 70 },
 ];
 
+const pieData = [
+  { name: 'Group A', value: 400 },
+  { name: 'Group B', value: 300 },
+  { name: 'Group C', value: 300 },
+  { name: 'Group D', value: 200 },
+];
+
+const areaData = [
+  { name: 'Jan', uv: 4000, pv: 2400, amt: 2400 },
+  { name: 'Feb', uv: 3000, pv: 1398, amt: 2210 },
+  { name: 'Mar', uv: 2000, pv: 9800, amt: 2290 },
+  { name: 'Apr', uv: 2780, pv: 3908, amt: 2000 },
+  { name: 'May', uv: 1890, pv: 4800, amt: 2181 },
+];
+
 export default function Dashboard() {
-  const navigate = useNavigate();
-  const [users, setUsers] = useState([]);
-
-  useEffect(() => {
-    // ดึงข้อมูลผู้ใช้ที่ถูก report จาก API
-    axios.get(`${url}/userreport`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-    .then((response) => {
-      setUsers(response.data); // ตั้งค่าผู้ใช้จากการตอบสนองของ API
-    })
-    .catch((error) => {
-      console.error('Error fetching users:', error);
-    });
-  }, []);
-
-  const handleBanUser = (userID) => {
-    axios.put(`${url}/user/ban/${userID}`, null, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-    .then((response) => {
-      if (response.data.status === true) {
-        alert(response.data.message);
-        setUsers((prevUsers) => prevUsers.map(user => user.userID === userID ? { ...user, isActive: 0 } : user));
-      } else {
-        alert('Failed to suspend user');
-      }
-    })
-    .catch((error) => {
-      console.error('Error suspending user:', error);
-    });
-  };
-
-  const handleUnbanUser = (userID) => {
-    axios.put(`${url}/user/unban/${userID}`, null, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-    .then((response) => {
-      if (response.data.status === true) {
-        alert(response.data.message);
-        setUsers((prevUsers) => prevUsers.map(user => user.userID === userID ? { ...user, isActive: 1 } : user));
-      } else {
-        alert('Failed to unban user');
-      }
-    })
-    .catch((error) => {
-      console.error('Error unbanning user:', error);
-    });
-  };
-
-  // ฟังก์ชันสำหรับ logout
-  const handleLogout = () => {
-    axios.post(`${url}/logout`, {}, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-    .then((response) => {
-      if (response.data.status === true) {
-        // ลบ token ออกจาก localStorage
-        localStorage.removeItem('token');
-        
-        // นำทางไปยังหน้า login
-        navigate('/signinadmin');
-        
-        // ป้องกันการย้อนกลับไปยังหน้า dashboard
-        window.history.pushState(null, '', '/signinadmin');
-        window.addEventListener('popstate', () => {
-          window.history.pushState(null, '', '/signinadmin');
-        });
-      }
-    })
-    .catch((error) => {
-      console.error('Error during logout:', error);
-    });
-  };
-
   return (
-    <Box sx={{ display: 'flex', backgroundColor: '#F8E9F0', minHeight: '100vh' }}>
-      {/* Main Content */}
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          padding: 3,
-          backgroundColor: '#F8E9F0',
-        }}
-      >
+    <Box sx={{ display: 'flex', backgroundColor: '#F8E9F0', height: '100vh', overflow: 'hidden', paddingTop: '80px' }}> {/* ล็อกการเลื่อน */}
+      <Box component="main" sx={{ flexGrow: 1, padding: 3, backgroundColor: '#F8E9F0' }}>
         <Container maxWidth="lg" sx={{ mt: 4 }}>
-          {/* Charts */}
           <Grid container spacing={4}>
+            {/* การ์ดแสดงกราฟผู้ใช้งานใหม่ */}
             <Grid item xs={12} md={6}>
-              <Card sx={{ backgroundColor: '#fff', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', border: '2px solid black' }}>
+              <Card
+                sx={{
+                  backgroundColor: '#fff',
+                  borderRadius: '10px',
+                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                  border: '2px solid black',
+                  transition: 'transform 0.3s ease',
+                  '&:hover': { transform: 'scale(1.05)' }, // เอฟเฟกต์เมื่อเอาเมาส์ไปชี้
+                }}
+              >
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
                     ผู้ใช้งานใหม่
@@ -138,8 +70,18 @@ export default function Dashboard() {
               </Card>
             </Grid>
 
+            {/* การ์ดแสดงกราฟจำนวนการแมท */}
             <Grid item xs={12} md={6}>
-              <Card sx={{ backgroundColor: '#fff', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', border: '2px solid black' }}>
+              <Card
+                sx={{
+                  backgroundColor: '#fff',
+                  borderRadius: '10px',
+                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                  border: '2px solid black',
+                  transition: 'transform 0.3s ease',
+                  '&:hover': { transform: 'scale(1.05)' }, // เอฟเฟกต์เมื่อเอาเมาส์ไปชี้
+                }}
+              >
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
                     จำนวนการแมท
@@ -156,80 +98,65 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
             </Grid>
-          </Grid>
 
-          {/* User Table */}
-          <Box sx={{ mt: 4 }}>
-            <Typography variant="h6" gutterBottom>
-              ผู้ใช้ถูกระงับใหม่
-            </Typography>
-            <TableContainer component={Paper} sx={{ backgroundColor: '#fff', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', border: '2px solid black' }}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell align="center" sx={{ padding: '16px', width: 100 }}>รหัส</TableCell>
-                    <TableCell align="center" sx={{ padding: '16px', width: 100 }}>รูป</TableCell>
-                    <TableCell align="left" sx={{ padding: '16px' }}>ชื่อผู้ใช้</TableCell>
-                    <TableCell align="left" sx={{ padding: '16px' }}>เหตุผล</TableCell>
-                    <TableCell align="center" sx={{ padding: '16px' }}>จัดการข้อมูล</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {users.map((user) => (
-                    <TableRow key={user.userID}>
-                      <TableCell align="center" sx={{ padding: '16px' }}>{user.userID}</TableCell>
-                      <TableCell align="center" sx={{ padding: '16px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                        <Avatar 
-                          src={`${url}/user/image/${user.imageFile}`} 
-                          alt={user.username} 
-                          sx={{ width: 50, height: 50 }} // ขนาดรูปภาพคงที่
-                        />
-                      </TableCell>
-                      <TableCell align="left" sx={{ padding: '16px' }}>{user.username}</TableCell>
-                      <TableCell align="left" sx={{ padding: '16px' }}>{user.reportType || 'ไม่ระบุเหตุผล'}</TableCell>
-                      <TableCell align="center" sx={{ padding: '16px' }}>
-                        <ButtonGroup color="primary" aria-label="outlined primary button group">
-                          {user.isActive === 1 ? (
-                            <Button
-                              variant="outlined"
-                              sx={{
-                                borderRadius: '10px',
-                                color: 'red',
-                                borderColor: 'red',
-                                backgroundColor: 'white',
-                                '&:hover': {
-                                  backgroundColor: '#ffe6e6',
-                                },
-                              }}
-                              onClick={() => handleBanUser(user.userID)}
-                            >
-                              ระงับผู้ใช้
-                            </Button>
-                          ) : (
-                            <Button
-                              variant="outlined"
-                              sx={{
-                                borderRadius: '10px',
-                                color: 'black',
-                                borderColor: 'black',
-                                backgroundColor: 'white',
-                                '&:hover': {
-                                  backgroundColor: '#f8e9f0',
-                                },
-                              }}
-                              onClick={() => handleUnbanUser(user.userID)}
-                            >
-                              ปลดแบน
-                            </Button>
-                          )}
-                        </ButtonGroup>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Box>
+            {/* การ์ดแสดงกราฟ Pie Chart */}
+            <Grid item xs={12} md={6}>
+              <Card
+                sx={{
+                  backgroundColor: '#fff',
+                  borderRadius: '10px',
+                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                  border: '2px solid black',
+                  transition: 'transform 0.3s ease',
+                  '&:hover': { transform: 'scale(1.05)' }, // เอฟเฟกต์เมื่อเอาเมาส์ไปชี้
+                }}
+              >
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    การใช้ระบบโดยรวม (Pie Chart)
+                  </Typography>
+                  <ResponsiveContainer width="100%" height={250}>
+                    <PieChart>
+                      <Pie data={pieData} dataKey="value" cx="50%" cy="50%" outerRadius={80} fill="#8884d8" label>
+                        {pieData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={['#8884d8', '#82ca9d', '#ffc658'][index % 3]} />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            {/* การ์ดแสดงกราฟ Area Chart */}
+            <Grid item xs={12} md={6}>
+              <Card
+                sx={{
+                  backgroundColor: '#fff',
+                  borderRadius: '10px',
+                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                  border: '2px solid black',
+                  transition: 'transform 0.3s ease',
+                  '&:hover': { transform: 'scale(1.05)' }, // เอฟเฟกต์เมื่อเอาเมาส์ไปชี้
+                }}
+              >
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    สถิติการใช้งาน (Area Chart)
+                  </Typography>
+                  <ResponsiveContainer width="100%" height={250}>
+                    <AreaChart data={areaData}>
+                      <CartesianGrid stroke="#ccc" />
+                      <XAxis dataKey="name" stroke="#000" />
+                      <YAxis stroke="#000" />
+                      <Tooltip />
+                      <Area type="monotone" dataKey="uv" stroke="#8884d8" fill="#8884d8" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
         </Container>
       </Box>
     </Box>
