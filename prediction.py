@@ -33,16 +33,7 @@ db = mysql.connector.connect(
     database="db_miniprojectfinal"  # Replace with your database name
 )
 
-# Function to delete file after a certain time
-def delete_file_after_delay(file_path, delay):
-    def delete_file():
-        if os.path.exists(file_path):
-            os.remove(file_path)
-            print(f"{file_path} has been deleted.")
-    timer = threading.Timer(delay, delete_file)  # Run after 'delay' seconds
-    timer.start()
-
-# Route to handle image uploads and predictions
+# Route to handle image predictions
 @app.route('/predict', methods=['POST'])
 def predict():
     if 'image' not in request.files:
@@ -136,8 +127,5 @@ def predict_age():
 
 # Start the Flask app
 if __name__ == '__main__':
-    # Create the 'uploads' folder if it doesn't exist
-    if not os.path.exists('uploads'):
-        os.makedirs('uploads')
 
     app.run(host='0.0.0.0', port=5000, debug=True)
