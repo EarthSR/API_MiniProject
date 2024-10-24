@@ -105,19 +105,28 @@ def predict_age():
         return jsonify({'error': 'No image provided'}), 400
 
     file = request.files['image']
+    if not file.content_type.startswith('image/'):
+        return jsonify({'error': 'Invalid file type. Please upload an image.'}), 400
+
     try:
+        # Load and preprocess the image
         image = tf.keras.preprocessing.image.load_img(BytesIO(file.read()), target_size=(224, 224))
         image = tf.keras.preprocessing.image.img_to_array(image)
         image = np.expand_dims(image, axis=0)  # Add batch dimension
         image = image / 255.0  # Rescale the image
-    except Exception as e:
-        return jsonify({'error': f'Error processing image: {str(e)}'}), 500
 
-    try:
+        # Log the shape of the image
+        print(f"Image shape: {image.shape}")
+
+        # Make prediction
         prediction = age_prediction_model.predict(image)
         predicted_age = float(prediction[0][0])
+        
+        # Log the prediction result
+        print(f"Predicted age: {predicted_age}")
+
     except Exception as e:
-        return jsonify({'error': f'Error during prediction: {str(e)}'}), 500
+        return jsonify({'error': f'Error processing image: {str(e)}'}), 500
 
     # Prepare the data for database insertion
     age_date = datetime.now().strftime('%Y-%m-%d')
