@@ -8,7 +8,8 @@ const cors = require('cors');
 const fetch = require('node-fetch');
 const SECRET_KEY = 'UX23Y24%@&2aMb';
 const app = express();
-
+const MAX_FAILED_ATTEMPTS = 5;
+const LOCK_TIME = 5 * 60 * 1000; // 5 นาทีในหน่วยมิลลิวินาที
 
 // MySQL connection
 const db = mysql.createConnection({
@@ -35,48 +36,58 @@ app.use(cors());
 /////////////////////////////////////// React ///////////////////////////////////////
 
 
-// Login API
-app.post('/api/login', async (req, res) => {
+app.post('/login', async (req, res) => {
     const { username, password } = req.body;
-    let sql = '';
-    let user = {};
-    let Role_ID = null;
 
-    try {
-        // Query for user from the 'users' table
-        sql = "SELECT * FROM users WHERE username=?";
-        let users = await query(sql, [username]);
-
-        if (users.length > 0) {
-            user = users[0];
-            Role_ID = user['Role_ID'];
-
-            // ตรวจสอบว่าเฉพาะ Role_ID 1 หรือ 2 ที่สามารถเข้าสู่ระบบได้
-            if (Role_ID !== 1 && Role_ID !== 2) {
-                return res.send({ message: 'คุณไม่มีสิทธิ์ในการเข้าสู่ระบบ', status: false });
-            }
-
-            // ตรวจสอบรหัสผ่านโดยใช้ bcrypt
-            const passwordMatch = await bcrypt.compare(password, user['password']);
-            if (passwordMatch) {
-                // สร้าง JWT token
-                const token = jwt.sign({ id: user['id'], role: Role_ID }, SECRET_KEY, { expiresIn: '1h' });
-                return res.send({
-                    message: 'เข้าสู่ระบบสำเร็จ',
-                    status: true,
-                    token: token,
-                    Role_ID: Role_ID
-                });
-            } else {
-                return res.send({ message: 'รหัสผ่านไม่ถูกต้อง', status: false });
-            }
-        } else {
-            return res.send({ message: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', status: false });
+    // ตรวจสอบผู้ใช้ในฐานข้อมูล
+    const query = `SELECT * FROM users WHERE username = ?`;
+    db.query(query, [username], async (err, results) => {
+        if (err) return res.status(500).send(err);
+        if (results.length === 0) {
+            return res.status(401).json({ message: "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง" });
         }
-    } catch (error) {
-        console.error(error);
-        return res.status(500).send({ message: 'เกิดข้อผิดพลาดในระบบ', status: false });
-    }
+
+        const user = results[0];
+
+        // ตรวจสอบว่าบัญชีถูกล็อกหรือไม่
+        const now = new Date();
+        if (user.lock_until && new Date(user.lock_until) > now) {
+            return res.status(403).json({ message: "บัญชีถูกล็อก กรุณาลองใหม่อีกครั้งในภายหลัง" });
+        }
+
+        // ตรวจสอบรหัสผ่าน
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            // เพิ่มจำนวนการลองล็อกอินผิดพลาด
+            let failed_attempts = user.failed_attempts + 1;
+            let lock_until = null;
+
+            if (failed_attempts >= MAX_FAILED_ATTEMPTS) {
+                // ล็อกบัญชีเป็นเวลา 5 นาที
+                lock_until = new Date(now.getTime() + LOCK_TIME);
+            }
+
+            // อัปเดตข้อมูลผู้ใช้ในฐานข้อมูล
+            const updateQuery = `UPDATE users SET failed_attempts = ?, lock_until = ? WHERE username = ?`;
+            db.query(updateQuery, [failed_attempts, lock_until, username], (err) => {
+                if (err) return res.status(500).send(err);
+                if (lock_until) {
+                    return res.status(403).json({ message: "บัญชีถูกล็อกเป็นเวลา 5 นาที" });
+                }
+                return res.status(401).json({ message: "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง" });
+            });
+        } else {
+            // ล็อกอินสำเร็จ รีเซ็ตจำนวนการลองผิดพลาด
+            const updateQuery = `UPDATE users SET failed_attempts = 0, lock_until = NULL WHERE username = ?`;
+            db.query(updateQuery, [username], (err) => {
+                if (err) return res.status(500).send(err);
+
+                // สร้าง JWT token
+                const token = jwt.sign({ id: user.Users_ID, username: user.username }, 'secret_key', { expiresIn: '1h' });
+                return res.json({ message: 'ล็อกอินสำเร็จ', token });
+            });
+        }
+    });
 });
 
 // Logout API
@@ -124,6 +135,41 @@ app.get('/api/get-count-age',async (req, res) => {
         console.error(error);
         res.status(500).send({'message': 'เกิดข้อผิดพลาดในระบบ', 'status': false});
     }
+});
+
+// API สำหรับนับจำนวนตามเดือนจากตาราง age
+
+app.get('/age-count', (req, res) => {
+    const query = `
+        SELECT MONTH(age_Date) AS month, COUNT(*) AS count_per_month
+        FROM age
+        GROUP BY MONTH(age_Date)
+        ORDER BY MONTH(age_Date);
+    `;
+    
+    db.query(query, (err, results) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+        res.json(results);
+    });
+});
+
+// API สำหรับนับจำนวนตามเดือนจากตาราง similarity
+app.get('/similarity-count', (req, res) => {
+    const query = `
+        SELECT MONTH(similarity_Date) AS month, COUNT(*) AS count_per_month
+        FROM similarity
+        GROUP BY MONTH(similarity_Date)
+        ORDER BY MONTH(similarity_Date);
+    `;
+    
+    db.query(query, (err, results) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+        res.json(results);
+    });
 });
 
 
