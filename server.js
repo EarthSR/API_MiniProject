@@ -84,21 +84,6 @@ app.post('/api/logout', (req, res) => {
     res.send({ status: true, message: 'Logout successful' });
 });
 
-app.post('/api/predict', async (req, res) => {
-    try {
-        const formData = new FormData();
-        formData.append('image', req.body.image);
-            const response = await fetch(process.env.REACT_APP_PREDICT_BASE_URL + '/predict', {
-            method: 'POST',
-            body: formData,
-        });
-
-        const data = await response.json();
-        res.send(data);
-    } catch (error) {
-        res.status(500).send({ message: 'Error connecting to Flask server', error: error.message });
-    }
-});
 
 
 /////////////////////////////////////// Mobile ///////////////////////////////////////
