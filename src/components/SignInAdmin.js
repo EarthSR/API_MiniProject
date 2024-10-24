@@ -30,12 +30,12 @@ export default function SigninAdmin() {
       alert(result.message);
 
       if (result.token) {
+        // เก็บ token ลง localStorage
         localStorage.setItem('token', result.token);
         navigate('/dashboard');  // นำทางไปหน้า dashboard ถ้าล็อกอินสำเร็จ
       }
     } catch (err) {
       if (err.response) {
-        // ตรวจสอบสถานะการล็อกหรือการพยายามผิดพลาด
         if (err.response.status === 403) {
           alert("บัญชีของคุณถูกล็อกเป็นเวลา 5 นาที");
         } else if (err.response.status === 401) {
