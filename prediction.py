@@ -39,50 +39,44 @@ def predict():
     if 'image' not in request.files:
         return jsonify({"error": "No image file provided"}), 400
 
-    # Get the image from the request
     file = request.files['image']
+    if not file.content_type.startswith('image/'):
+        return jsonify({"error": "Invalid file type. Please upload an image."}), 400
 
-    # Load the image from memory without saving to disk
     try:
-        image = tf.keras.preprocessing.image.load_img(BytesIO(file.read()), target_size=(224, 224))
+        file_stream = BytesIO(file.read())
+        file_stream.seek(0)  # Reset the pointer of the file stream
+        image = tf.keras.preprocessing.image.load_img(file_stream, target_size=(224, 224))
         image = tf.keras.preprocessing.image.img_to_array(image)
         image = tf.expand_dims(image, axis=0)  # Add batch dimension
     except Exception as e:
         return jsonify({"error": f"Error processing image: {str(e)}"}), 500
 
-    # Make the prediction
     try:
         predictions = model.predict(image, verbose=0)
-        predicted_class = int(tf.argmax(predictions, axis=1).numpy()[0])  # Convert numpy.int64 to int
+        predicted_class = int(tf.argmax(predictions, axis=1).numpy()[0])
         confidence_score = predictions[0][predicted_class]
     except Exception as e:
         return jsonify({"error": f"Error during model prediction: {str(e)}"}), 500
 
-    # Prepare the response
     result = {
         "predicted_class": class_labels[predicted_class],
         "confidence_score": round(float(confidence_score) * 100, 2)
     }
 
-    # Attempt to retrieve ThaiCelebrities_ID from the database
     try:
         cursor = db.cursor()
-
-        # Query to get ThaiCelebrities_ID from thaicelebrities table
         sql_get_celebrity_id = "SELECT ThaiCelebrities_ID FROM thaicelebrities WHERE ThaiCelebrities_name = %s"
         cursor.execute(sql_get_celebrity_id, (class_labels[predicted_class],))
         result_id = cursor.fetchone()
 
-        if result_id:
-            thai_celebrities_id = result_id[0]  # Extract the ID
-        else:
+        if not result_id:
             return jsonify({"error": "Celebrity not found in the database"}), 404
 
-        # Save the prediction result into the similarity table
+        thai_celebrities_id = result_id[0]
         similarity_date = datetime.now().strftime('%Y-%m-%d')
         similarity_percent = result["confidence_score"]
 
-        # SQL query to insert data into similarity table
         sql_insert_similarity = """
         INSERT INTO similarity (similarity_Date, similarityDetail_Percent, ThaiCelebrities_ID) 
         VALUES (%s, %s, %s)
@@ -97,7 +91,8 @@ def predict():
         db.rollback()
         return jsonify({"error": str(e)}), 500
     finally:
-        cursor.close()
+        if cursor:
+            cursor.close()
 
     return jsonify(result), 200
 
@@ -106,22 +101,36 @@ def predict():
 # API endpoint to predict age
 @app.route('/predict/age', methods=['POST'])
 def predict_age():
-    # Get the image file from the request
     if 'image' not in request.files:
         return jsonify({'error': 'No image provided'}), 400
 
-    # Load the image from memory
     file = request.files['image']
-    image = tf.keras.preprocessing.image.load_img(BytesIO(file.read()), target_size=(224, 224))
-    image = tf.keras.preprocessing.image.img_to_array(image)
-    image = np.expand_dims(image, axis=0)  # Add batch dimension
-    image = image / 255.0  # Rescale the image
+    try:
+        image = tf.keras.preprocessing.image.load_img(BytesIO(file.read()), target_size=(224, 224))
+        image = tf.keras.preprocessing.image.img_to_array(image)
+        image = np.expand_dims(image, axis=0)  # Add batch dimension
+        image = image / 255.0  # Rescale the image
+    except Exception as e:
+        return jsonify({'error': f'Error processing image: {str(e)}'}), 500
 
-    # Make prediction using the age prediction model
-    prediction = age_prediction_model.predict(image)
-    predicted_age = float(prediction[0][0])
+    try:
+        prediction = age_prediction_model.predict(image)
+        predicted_age = float(prediction[0][0])
+    except Exception as e:
+        return jsonify({'error': f'Error during prediction: {str(e)}'}), 500
 
-    # Return the prediction as a JSON response
+    # Prepare the data for database insertion
+    age_date = datetime.now().strftime('%Y-%m-%d')
+    try:
+        cursor = db.cursor()
+        sql = "INSERT INTO age (age_Date, age_result) VALUES (%s, %s)"
+        cursor.execute(sql, (age_date, predicted_age))
+        db.commit()
+        cursor.close()
+    except mysql.connector.Error as err:
+        db.rollback()
+        return jsonify({'error': f'MySQL error: {str(err)}'}), 500
+
     return jsonify({'predicted_age': predicted_age})
 
 
