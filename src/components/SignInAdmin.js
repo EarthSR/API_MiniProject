@@ -17,11 +17,14 @@ export default function SigninAdmin() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
+  // ดึง baseURL จาก .env โดยใช้ในช่วงพัฒนาและ production
+  const baseURL = process.env.REACT_APP_BASE_URL;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post(process.env.REACT_APP_BASE_URL + '/login', {
+      const response = await axios.post(`${baseURL}/login`, {
         username,
         password
       });

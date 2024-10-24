@@ -1,3 +1,5 @@
+const http = require('http');
+const fs = require('fs');
 const express = require('express');
 const bodyParser = require('body-parser');
 const mysql = require('mysql2');
@@ -6,8 +8,9 @@ const jwt = require('jsonwebtoken');
 const util = require('util');
 const cors = require('cors');
 const fetch = require('node-fetch');
-const SECRET_KEY = 'UX23Y24%@&2aMb';
 const app = express();
+require('dotenv').config();
+
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCK_TIME = 5 * 60 * 1000; // 5 นาทีในหน่วยมิลลิวินาที
 
@@ -32,9 +35,7 @@ app.use(bodyParser.json());
 app.use(express.json());
 app.use(cors());
 
-
 /////////////////////////////////////// React ///////////////////////////////////////
-
 
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
@@ -83,7 +84,7 @@ app.post('/login', async (req, res) => {
                 if (err) return res.status(500).send(err);
 
                 // สร้าง JWT token
-                const token = jwt.sign({ id: user.Users_ID, username: user.username }, 'secret_key', { expiresIn: '1h' });
+                const token = jwt.sign({ id: user.Users_ID, username: user.username }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
                 return res.json({ message: 'ล็อกอินสำเร็จ', token });
             });
         }
@@ -94,8 +95,8 @@ app.post('/login', async (req, res) => {
 app.post('/api/logout', (req, res) => {
     res.send({ status: true, message: 'Logout successful' });
 });
-/// Dashbord /////
 
+// Dashboard
 app.get('/api/get-count-age',async (req, res) => {
     const sql = "SELECT COUNT(*) AS Count FROM age";
     db.query(sql, (err, results) => {
@@ -107,7 +108,7 @@ app.get('/api/get-count-age',async (req, res) => {
     });
   });
  
-  app.get('/api/get-count-similarity',async (req, res) => {
+app.get('/api/get-count-similarity',async (req, res) => {
     const sql = "SELECT COUNT(*) AS Count FROM similarity";
     db.query(sql, (err, results) => {
       if (err) throw err;
@@ -118,7 +119,7 @@ app.get('/api/get-count-age',async (req, res) => {
     });
   });
  
-  app.get('/api/get-star-top', async (req, res) => {
+app.get('/api/get-star-top', async (req, res) => {
     const sql = `
         SELECT t.ThaiCelebrities_name, COUNT(s.ThaiCelebrities_ID) AS CelebrityCount
         FROM thaicelebrities t
@@ -138,7 +139,6 @@ app.get('/api/get-count-age',async (req, res) => {
 });
 
 // API สำหรับนับจำนวนตามเดือนจากตาราง age
-
 app.get('/age-count', (req, res) => {
     const query = `
         SELECT MONTH(age_Date) AS month, COUNT(*) AS count_per_month
@@ -172,10 +172,7 @@ app.get('/similarity-count', (req, res) => {
     });
 });
 
-
-
 /////////////////////////////////////// Mobile ///////////////////////////////////////
-
 
 // -------- ROUTES --------
 
@@ -294,9 +291,10 @@ app.post('/age', (req, res) => {
     });
 });
 
+// -------- START HTTP SERVER --------
+const httpPort = 3000;  // ใช้พอร์ต 3000 สำหรับ HTTP ในการทดสอบในเครื่อง
+const httpServer = http.createServer(app);
 
-// -------- START SERVER --------
-const port = 3000;
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+httpServer.listen(httpPort, () => {
+    console.log(`HTTP Server running on port ${httpPort}`);
 });
