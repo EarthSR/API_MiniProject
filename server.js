@@ -83,6 +83,48 @@ app.post('/api/login', async (req, res) => {
 app.post('/api/logout', (req, res) => {
     res.send({ status: true, message: 'Logout successful' });
 });
+/// Dashbord /////
+
+app.get('/api/get-count-age',async (req, res) => {
+    const sql = "SELECT COUNT(*) AS Count FROM age";
+    db.query(sql, (err, results) => {
+      if (err) throw err;
+        const CardData = results[0];
+        CardData['message'] = "ทำรายการสำเร็จ"
+        CardData['status'] = true
+        res.send(CardData);
+    });
+  });
+ 
+  app.get('/api/get-count-similarity',async (req, res) => {
+    const sql = "SELECT COUNT(*) AS Count FROM similarity";
+    db.query(sql, (err, results) => {
+      if (err) throw err;
+        const CardData = results[0];
+        CardData['message'] = "ทำรายการสำเร็จ"
+        CardData['status'] = true
+        res.send(CardData);
+    });
+  });
+ 
+  app.get('/api/get-star-top', async (req, res) => {
+    const sql = `
+        SELECT t.ThaiCelebrities_name, COUNT(s.ThaiCelebrities_ID) AS CelebrityCount
+        FROM thaicelebrities t
+        LEFT JOIN similarity s ON t.ThaiCelebrities_ID = s.ThaiCelebrities_ID
+        GROUP BY t.ThaiCelebrities_name
+        ORDER BY CelebrityCount DESC
+        LIMIT 5;
+    `;
+ 
+    try {
+        const rows = await query(sql);
+        res.json(rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({'message': 'เกิดข้อผิดพลาดในระบบ', 'status': false});
+    }
+});
 
 
 
