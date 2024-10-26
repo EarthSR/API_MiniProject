@@ -33,68 +33,117 @@ db = mysql.connector.connect(
     database="db_miniprojectfinal"  # Replace with your database name
 )
 
-# Function to delete file after a certain time
-def delete_file_after_delay(file_path, delay):
-    def delete_file():
-        if os.path.exists(file_path):
-            os.remove(file_path)
-            print(f"{file_path} has been deleted.")
-    timer = threading.Timer(delay, delete_file)  # Run after 'delay' seconds
-    timer.start()
-
+# Route to handle image predictions
 @app.route('/predict', methods=['POST'])
 def predict():
     if 'image' not in request.files:
         return jsonify({"error": "No image file provided"}), 400
 
-    # Get the image from the request
     file = request.files['image']
+    if not file.content_type.startswith('image/'):
+        return jsonify({"error": "Invalid file type. Please upload an image."}), 400
 
-    # Load the image from memory without saving to disk
-    image = tf.keras.preprocessing.image.load_img(BytesIO(file.read()), target_size=(224, 224))
-    image = tf.keras.preprocessing.image.img_to_array(image)
-    image = tf.expand_dims(image, axis=0)  # Add batch dimension
+    try:
+        file_stream = BytesIO(file.read())
+        file_stream.seek(0)  # Reset the pointer of the file stream
+        image = tf.keras.preprocessing.image.load_img(file_stream, target_size=(224, 224))
+        image = tf.keras.preprocessing.image.img_to_array(image)
+        image = tf.expand_dims(image, axis=0)  # Add batch dimension
+    except Exception as e:
+        return jsonify({"error": f"Error processing image: {str(e)}"}), 500
 
-    # Make the prediction
-    predictions = model.predict(image, verbose=0)
-    predicted_class = tf.argmax(predictions, axis=1).numpy()[0]
-    confidence_score = predictions[0][predicted_class]
+    try:
+        predictions = model.predict(image, verbose=0)
+        predicted_class = int(tf.argmax(predictions, axis=1).numpy()[0])
+        confidence_score = predictions[0][predicted_class]
+    except Exception as e:
+        return jsonify({"error": f"Error during model prediction: {str(e)}"}), 500
 
-    # Prepare the response
     result = {
         "predicted_class": class_labels[predicted_class],
         "confidence_score": round(float(confidence_score) * 100, 2)
     }
 
+    try:
+        cursor = db.cursor()
+        sql_get_celebrity_id = "SELECT ThaiCelebrities_ID FROM thaicelebrities WHERE ThaiCelebrities_name = %s"
+        cursor.execute(sql_get_celebrity_id, (class_labels[predicted_class],))
+        result_id = cursor.fetchone()
+
+        if not result_id:
+            return jsonify({"error": "Celebrity not found in the database"}), 404
+
+        thai_celebrities_id = result_id[0]
+        similarity_date = datetime.now().strftime('%Y-%m-%d')
+        similarity_percent = result["confidence_score"]
+
+        sql_insert_similarity = """
+        INSERT INTO similarity (similarity_Date, similarityDetail_Percent, ThaiCelebrities_ID) 
+        VALUES (%s, %s, %s)
+        """
+        cursor.execute(sql_insert_similarity, (similarity_date, similarity_percent, thai_celebrities_id))
+        db.commit()
+
+    except mysql.connector.Error as err:
+        db.rollback()
+        return jsonify({"error": f"MySQL error: {str(err)}"}), 500
+    except Exception as e:
+        db.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        if cursor:
+            cursor.close()
+
     return jsonify(result), 200
+
 
 
 # API endpoint to predict age
 @app.route('/predict/age', methods=['POST'])
 def predict_age():
-    # Get the image file from the request
     if 'image' not in request.files:
         return jsonify({'error': 'No image provided'}), 400
 
-    # Load the image from memory
     file = request.files['image']
-    image = tf.keras.preprocessing.image.load_img(BytesIO(file.read()), target_size=(224, 224))
-    image = tf.keras.preprocessing.image.img_to_array(image)
-    image = np.expand_dims(image, axis=0)  # Add batch dimension
-    image = image / 255.0  # Rescale the image
+    if not file.content_type.startswith('image/'):
+        return jsonify({'error': 'Invalid file type. Please upload an image.'}), 400
 
-    # Make prediction using the age prediction model
-    prediction = age_prediction_model.predict(image)
-    predicted_age = float(prediction[0][0])
+    try:
+        # Load and preprocess the image
+        image = tf.keras.preprocessing.image.load_img(BytesIO(file.read()), target_size=(224, 224))
+        image = tf.keras.preprocessing.image.img_to_array(image)
+        image = np.expand_dims(image, axis=0)  # Add batch dimension
+        image = image / 255.0  # Rescale the image
 
-    # Return the prediction as a JSON response
+        # Log the shape of the image
+        print(f"Image shape: {image.shape}")
+
+        # Make prediction
+        prediction = age_prediction_model.predict(image)
+        predicted_age = float(prediction[0][0])
+        
+        # Log the prediction result
+        print(f"Predicted age: {predicted_age}")
+
+    except Exception as e:
+        return jsonify({'error': f'Error processing image: {str(e)}'}), 500
+
+    # Prepare the data for database insertion
+    age_date = datetime.now().strftime('%Y-%m-%d')
+    try:
+        cursor = db.cursor()
+        sql = "INSERT INTO age (age_Date, age_result) VALUES (%s, %s)"
+        cursor.execute(sql, (age_date, predicted_age))
+        db.commit()
+        cursor.close()
+    except mysql.connector.Error as err:
+        db.rollback()
+        return jsonify({'error': f'MySQL error: {str(err)}'}), 500
+
     return jsonify({'predicted_age': predicted_age})
 
 
 # Start the Flask app
 if __name__ == '__main__':
-    # Create the 'uploads' folder if it doesn't exist
-    if not os.path.exists('uploads'):
-        os.makedirs('uploads')
 
     app.run(host='0.0.0.0', port=5000, debug=True)

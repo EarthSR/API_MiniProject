@@ -8,7 +8,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';  // นำเข้า framer-motion
+import { motion } from 'framer-motion';
 
 const defaultTheme = createTheme();
 
@@ -17,38 +17,45 @@ export default function SigninAdmin() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
+  // ดึง baseURL จาก .env โดยใช้ในช่วงพัฒนาและ production
+  const baseURL = process.env.REACT_APP_BASE_URL;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post(process.env.REACT_APP_BASE_URL + '/api/login',
-        {
-          username,
-          password
-        }
-      );
+      const response = await axios.post(`${baseURL}/login`, {
+        username,
+        password
+      });
 
       const result = response.data;
-      alert(result['message']);
+      alert(result.message);
 
-      if (result['status'] === true) {
-        localStorage.setItem('token', result['token']);
-        if (result['Role_ID'] === 1 || result['Role_ID'] === 2) {
-          navigate('/dashboard');  // นำทางไปหน้า dashboard ถ้าเป็น admin หรือ employee
-        } else {
-          alert('คุณไม่มีสิทธิ์ในการเข้าถึงระบบ');
-        }
+      if (result.token) {
+        // เก็บ token ลง localStorage
+        localStorage.setItem('token', result.token);
+        navigate('/dashboard');  // นำทางไปหน้า dashboard ถ้าล็อกอินสำเร็จ
       }
     } catch (err) {
-      console.log(err);
-      alert('เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์');
+      if (err.response) {
+        if (err.response.status === 403) {
+          alert("บัญชีของคุณถูกล็อกเป็นเวลา 5 นาที");
+        } else if (err.response.status === 401) {
+          alert("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
+        } else {
+          alert("เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์");
+        }
+      } else {
+        alert("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้");
+      }
     }
   };
 
   return (
     <ThemeProvider theme={defaultTheme}>
       <motion.div
-        initial={{ opacity: 0, y: 50 }}  // Animation ตอนโหลดหน้าเข้ามา
+        initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -50 }}
         transition={{ duration: 0.5 }}
@@ -57,7 +64,7 @@ export default function SigninAdmin() {
         <Box
           sx={{
             minHeight: '100vh',
-            backgroundColor: '#faf5f5', // สีพื้นหลังอ่อนๆ
+            backgroundColor: '#faf5f5',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -67,14 +74,13 @@ export default function SigninAdmin() {
             <CssBaseline />
             <Box
               sx={{
-                mt: 10,  // เพิ่ม margin-top 100px
+                mt: 10,
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 width: '100%',
                 padding: 4,
                 borderRadius: '16px',
-                boxShadow: 'none', // ลบเงาของกล่องและพื้นหลังสีขาว
               }}
             >
               <Typography component="h1" variant="h4" sx={{ fontWeight: 'bold', mb: 3, color: '#333' }}>
@@ -93,20 +99,20 @@ export default function SigninAdmin() {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   sx={{
-                    backgroundColor: '#ffffff',  // สีพื้นหลังกล่องข้อความ
+                    backgroundColor: '#ffffff',
                     mb: 2,
                     borderRadius: '8px',
                     '& .MuiOutlinedInput-root': {
                       '& fieldset': {
-                        borderColor: '#000000', // ขอบกล่องข้อความเป็นสีดำ
+                        borderColor: '#000000',
                       },
                       '&:hover fieldset': {
-                        borderColor: '#FF69B4',  // สีขอบเมื่อ hover เป็นสีชมพู
+                        borderColor: '#FF69B4',
                       },
                     },
                   }}
                   InputLabelProps={{
-                    style: { color: '#333' },  // สีตัวอักษรของ Label
+                    style: { color: '#333' },
                   }}
                 />
                 <TextField
@@ -121,20 +127,20 @@ export default function SigninAdmin() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   sx={{
-                    backgroundColor: '#ffffff',  // สีพื้นหลังกล่องข้อความ
+                    backgroundColor: '#ffffff',
                     mb: 2,
                     borderRadius: '8px',
                     '& .MuiOutlinedInput-root': {
                       '& fieldset': {
-                        borderColor: '#000000',  // ขอบกล่องข้อความเป็นสีดำ
+                        borderColor: '#000000',
                       },
                       '&:hover fieldset': {
-                        borderColor: '#FF69B4',  // สีขอบเมื่อ hover เป็นสีชมพู
+                        borderColor: '#FF69B4',
                       },
                     },
                   }}
                   InputLabelProps={{
-                    style: { color: '#333' },  // สีตัวอักษรของ Label
+                    style: { color: '#333' },
                   }}
                 />
                 <Button
@@ -145,16 +151,15 @@ export default function SigninAdmin() {
                   sx={{
                     mt: 3,
                     mb: 2,
-                    backgroundColor: '#FFE5EC',  // พื้นหลังปุ่มเป็นสีชมพูอ่อน
-                    color: '#FB6F92',  // ตัวอักษรสีชมพูเข้ม
-                    border: '2px solid #F694C1',  // ขอบปุ่มสีชมพูอ่อน
+                    backgroundColor: '#FFE5EC',
+                    color: '#FB6F92',
+                    border: '2px solid #F694C1',
                     padding: '12px',
-                    borderRadius: '8px', // ขอบมนของปุ่ม
+                    borderRadius: '8px',
                     fontWeight: 'bold',
                     fontSize: '16px',
-                    boxShadow: 'none', // ไม่มีเงาปุ่ม
                     '&:hover': {
-                      backgroundColor: '#ffccd5', // สีพื้นหลังเมื่อ hover
+                      backgroundColor: '#ffccd5',
                     },
                   }}
                 >

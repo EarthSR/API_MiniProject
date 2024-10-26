@@ -118,12 +118,12 @@ export default function Mainpage() {
                 </CardContent>
               </Card>
 
-              {/* ข้อความเตือน */}
-              {errorMessage && (
-                <Typography variant="body1" color="error" sx={{ marginBottom: 2 }}>
-                  {errorMessage}
-                </Typography>
-              )}
+             {/* ข้อความเตือน */}
+{errorMessage && (
+  <Typography variant="body1" sx={{ marginBottom: 2, color: '#fff' }}> {/* เปลี่ยนสีเป็นสีขาว */}
+    {errorMessage}
+  </Typography>
+)}
 
               {/* ปุ่มทำนาย ที่ใหญ่และดูน่ากดมากขึ้น */}
               <Button
