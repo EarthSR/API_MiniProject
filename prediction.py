@@ -15,7 +15,7 @@ CORS(app)
 # Path where the model and labels are stored
 MODEL_PATH = 'model.h5'
 LABELS_PATH = 'star-labels.txt'
-age_prediction_model = tf.keras.models.load_model('age_prediction_model_pretrained_finetuned.h5')
+age_prediction_model = tf.keras.models.load_model('age_prediction_model_Final_2.h5')
 
 # Load the trained model
 model = tf.keras.models.load_model(MODEL_PATH)
@@ -120,7 +120,7 @@ def predict_age():
 
         # Make prediction
         prediction = age_prediction_model.predict(image)
-        predicted_age = float(prediction[0][0])
+        predicted_age = int(prediction[0][0])  # Convert to integer
         
         # Log the prediction result
         print(f"Predicted age: {predicted_age}")
