@@ -12,29 +12,32 @@ export default function Header() {
   };
 
   const handleLogoutClick = async () => {
-    // เรียก API เพื่อ logout
     try {
       const response = await fetch(process.env.REACT_APP_BASE_URL + '/api/logout', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       });
-      
+  
       const result = await response.json();
       if (result.status) {
-        // หลังจาก logout สำเร็จ ทำการนำทางไปหน้า mainpage และใช้ replace
+        // Remove token from local storage and navigate to the main page
         localStorage.removeItem('token');
         navigate('/mainpage', { replace: true });
-
-        // รีเซ็ตประวัติการท่องเว็บเพื่อป้องกันการย้อนกลับ
+  
+        // Block the back button to prevent returning to the previous page
         window.history.pushState(null, '', window.location.href);
         window.onpopstate = function () {
-          window.history.go(1); // บล็อกการย้อนกลับ
+          window.history.go(1);
         };
+  
+        // Refresh the page to clear any stored data
+        window.location.reload();
       }
     } catch (error) {
       console.error('Error during logout:', error);
     }
   };
+  
 
   const handleHomeClick = () => {
     navigate('/');
