@@ -4,35 +4,41 @@ import { PhotoLibrary } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import webbg from './image/webbg.png';
-import starImage from './image/star.png'; 
-import { useImage } from '../ImageContext'; // นำเข้า useImage
-
+import starImage from './image/star.png';
+import { useImage } from '../ImageContext';
+ 
 export default function Mainpage() {
-  const { setImageFile, imageFile } = useImage();  // ดึง setImageFile และ imageFile จาก context
+  const { setImageFile, imageFile } = useImage();
   const [imagePreviewUrl, setImagePreviewUrl] = useState(imageFile ? URL.createObjectURL(imageFile) : null);
-  const [errorMessage, setErrorMessage] = useState(''); 
+  const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
-
+ 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    setImageFile(file); // บันทึก imageFile ลง context
-    setErrorMessage(''); 
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreviewUrl(reader.result);
-    };
-    reader.readAsDataURL(file);
+ 
+    // ตรวจสอบว่าประเภทของไฟล์เป็นภาพเท่านั้น
+    if (file && file.type.startsWith('image/')) {
+      setImageFile(file); // บันทึก imageFile ลง context
+      setErrorMessage('');
+ 
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreviewUrl(reader.result);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setErrorMessage('กรุณาอัปโหลดเฉพาะไฟล์รูปภาพ!');
+    }
   };
-
+ 
   const handlePredict = () => {
     if (!imageFile) {
-      setErrorMessage('กรุณาอัปโหลดรูปภาพก่อนทำการทำนาย!'); 
+      setErrorMessage('กรุณาอัปโหลดรูปภาพก่อนทำการทำนาย!');
     } else {
       navigate('/next1');
     }
   };
-
+ 
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -57,19 +63,18 @@ export default function Mainpage() {
         }}
       >
         <Container maxWidth="lg">
-          <Box 
-            display="flex" 
-            justifyContent="space-between" 
-            alignItems="center" 
-            sx={{ flexDirection: { xs: 'column', md: 'row' }}}  // ปรับแนวการวางให้เรียงในแนวตั้งสำหรับโทรศัพท์
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            sx={{ flexDirection: { xs: 'column', md: 'row' }}}
           >
-            <Box 
-              display="flex" 
-              flexDirection="column" 
-              alignItems="center" 
-              sx={{ width: { xs: '100%', md: 'auto' }}}  // ปรับขนาดของกล่องให้เต็มจอในมือถือ
+            <Box
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              sx={{ width: { xs: '100%', md: 'auto' }}}
             >
-              {/* ข้อความ Select Image ที่ใหญ่และโดดเด่นขึ้น */}
               <Typography
                 variant="h3"
                 sx={{
@@ -77,12 +82,12 @@ export default function Mainpage() {
                   color: '#fff',
                   marginBottom: 3,
                   textShadow: '2px 2px 5px rgba(0, 0, 0, 0.5)',
-                  fontSize: { xs: '1.5rem', md: '3rem' },  // ปรับขนาดฟอนต์ตามขนาดหน้าจอ
+                  fontSize: { xs: '1.5rem', md: '3rem' },
                 }}
               >
                 Select Image
               </Typography>
-
+ 
               <Card
                 sx={{
                   width: { xs: '300px', md: '400px' },
@@ -112,20 +117,18 @@ export default function Mainpage() {
                         }}
                       />
                     ) : (
-                      <PhotoLibrary sx={{ fontSize: { xs: 50, md: 70 }, color: '#1976d2' }} /> // ไอคอนใหญ่ขึ้นและสีที่ชัดเจน
+                      <PhotoLibrary sx={{ fontSize: { xs: 50, md: 70 }, color: '#1976d2' }} />
                     )}
                   </IconButton>
                 </CardContent>
               </Card>
-
-             {/* ข้อความเตือน */}
-{errorMessage && (
-  <Typography variant="body1" sx={{ marginBottom: 2, color: '#fff' }}> {/* เปลี่ยนสีเป็นสีขาว */}
-    {errorMessage}
-  </Typography>
-)}
-
-              {/* ปุ่มทำนาย ที่ใหญ่และดูน่ากดมากขึ้น */}
+ 
+              {errorMessage && (
+                <Typography variant="body1" sx={{ marginBottom: 2, color: '#fff' }}>
+                  {errorMessage}
+                </Typography>
+              )}
+ 
               <Button
                 variant="contained"
                 color="secondary"
@@ -148,11 +151,10 @@ export default function Mainpage() {
                 ทำนาย
               </Button>
             </Box>
-
-            {/* แสดงกรอบรูป star ขวามือ (ซ่อนเมื่อเป็นมือถือ) */}
+ 
             <Box
               sx={{
-                display: { xs: 'none', md: 'flex' },  // ซ่อนรูปในหน้าจอมือถือ
+                display: { xs: 'none', md: 'flex' },
                 width: { xs: '200px', md: 'auto' },
                 height: { xs: '200px', md: 'auto' },
                 justifyContent: 'center',
@@ -162,7 +164,7 @@ export default function Mainpage() {
                 maxHeight: '600px',
               }}
             >
-              <img src={starImage} alt="Star" style={{ width: '100%', height: '100%', objectFit: 'contain' }} /> {/* กรอบรูป star */}
+              <img src={starImage} alt="Star" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </Box>
           </Box>
         </Container>
