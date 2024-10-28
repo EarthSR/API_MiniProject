@@ -37,7 +37,7 @@ app.use(cors());
 
 /////////////////////////////////////// React ///////////////////////////////////////
 
-app.post('/login', async (req, res) => {
+app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
 
     // ตรวจสอบผู้ใช้ในฐานข้อมูล
@@ -139,7 +139,7 @@ app.get('/api/get-star-top', async (req, res) => {
 });
 
 // API สำหรับนับจำนวนตามเดือนจากตาราง age
-app.get('/age-count', (req, res) => {
+app.get('/api/age-count', (req, res) => {
     const query = `
         SELECT MONTH(age_Date) AS month, COUNT(*) AS count_per_month
         FROM age
@@ -156,7 +156,7 @@ app.get('/age-count', (req, res) => {
 });
 
 // API สำหรับนับจำนวนตามเดือนจากตาราง similarity
-app.get('/similarity-count', (req, res) => {
+app.get('/api/similarity-count', (req, res) => {
     const query = `
         SELECT MONTH(similarity_Date) AS month, COUNT(*) AS count_per_month
         FROM similarity
@@ -177,7 +177,7 @@ app.get('/similarity-count', (req, res) => {
 // -------- ROUTES --------
 
 // Get all Thai Celebrities
-app.get('/thaiCelebrities', (req, res) => {
+app.get('/api/thaiCelebrities', (req, res) => {
     const sql = 'SELECT * FROM ThaiCelebrities';
     db.query(sql, (err, results) => {
         if (err) throw err;
@@ -186,7 +186,7 @@ app.get('/thaiCelebrities', (req, res) => {
 });
 
 // Add a new Thai Celebrity
-app.post('/thaiCelebrities', (req, res) => {
+app.post('/api/thaiCelebrities', (req, res) => {
     const { ThaiCelebrities_Imagefile } = req.body;
     const sql = 'INSERT INTO ThaiCelebrities (ThaiCelebrities_Imagefile) VALUES (?)';
     db.query(sql, [ThaiCelebrities_Imagefile], (err, result) => {
@@ -196,7 +196,7 @@ app.post('/thaiCelebrities', (req, res) => {
 });
 
 // Get all users
-app.get('/users', (req, res) => {
+app.get('/api/users', (req, res) => {
     const sql = 'SELECT * FROM Users';
     db.query(sql, (err, results) => {
         if (err) throw err;
@@ -205,7 +205,7 @@ app.get('/users', (req, res) => {
 });
 
 // Add a new user
-app.post('/users', (req, res) => {
+app.post('/api/users', (req, res) => {
     const { username, password, Role_ID } = req.body;
     const sql = 'INSERT INTO Users (username, password, Role_ID) VALUES (?, ?, ?)';
     db.query(sql, [username, password, Role_ID], (err, result) => {
@@ -215,7 +215,7 @@ app.post('/users', (req, res) => {
 });
 
 // Get all roles
-app.get('/roles', (req, res) => {
+app.get('/api/roles', (req, res) => {
     const sql = 'SELECT * FROM Role';
     db.query(sql, (err, results) => {
         if (err) throw err;
@@ -224,7 +224,7 @@ app.get('/roles', (req, res) => {
 });
 
 // Add a new role
-app.post('/roles', (req, res) => {
+app.post('/api/roles', (req, res) => {
     const { Type_Name } = req.body;
     const sql = 'INSERT INTO Role (Type_Name) VALUES (?)';
     db.query(sql, [Type_Name], (err, result) => {
@@ -234,7 +234,7 @@ app.post('/roles', (req, res) => {
 });
 
 // Get all similarity records
-app.get('/similarity', (req, res) => {
+app.get('/api/similarity', (req, res) => {
     const sql = 'SELECT * FROM similarity';
     db.query(sql, (err, results) => {
         if (err) throw err;
@@ -243,7 +243,7 @@ app.get('/similarity', (req, res) => {
 });
 
 // เพิ่ม similarity record หลังจากแปลงชื่อเป็น ID แล้ว
-app.post('/similarity', async (req, res) => {
+app.post('/api/similarity', async (req, res) => {
     const { similarity_Date, similarityDetail_Percent, celebrityName } = req.body;
 
     if (!celebrityName) {
@@ -273,7 +273,7 @@ app.post('/similarity', async (req, res) => {
 });
 
 // Get all age records
-app.get('/age', (req, res) => {
+app.get('/api/age', (req, res) => {
     const sql = 'SELECT * FROM age';
     db.query(sql, (err, results) => {
         if (err) throw err;
@@ -282,7 +282,7 @@ app.get('/age', (req, res) => {
 });
 
 // Add an age record
-app.post('/age', (req, res) => {
+app.post('/api/age', (req, res) => {
     const { age_Imageuser, age_Date, age_Percent, age_result } = req.body;
     const sql = 'INSERT INTO age (age_Imageuser, age_Date, age_Percent, age_result) VALUES (?, ?, ?, ?)';
     db.query(sql, [age_Imageuser, age_Date, age_Percent, age_result], (err, result) => {
