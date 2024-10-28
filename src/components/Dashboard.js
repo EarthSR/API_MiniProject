@@ -55,8 +55,8 @@ function Dashboard() {
                     axios.get(`${process.env.REACT_APP_BASE_URL}/api/get-count-age`, config),
                     axios.get(`${process.env.REACT_APP_BASE_URL}/api/get-count-similarity`, config),
                     axios.get(`${process.env.REACT_APP_BASE_URL}/api/get-star-top`, config),
-                    axios.get(`${process.env.REACT_APP_BASE_URL}/age-count`, config),
-                    axios.get(`${process.env.REACT_APP_BASE_URL}/similarity-count`, config)
+                    axios.get(`${process.env.REACT_APP_BASE_URL}/api/age-count`, config),
+                    axios.get(`${process.env.REACT_APP_BASE_URL}/api/get-count-similarity`, config)
                 ]);
 
                 // ลบ token ทันทีที่ข้อมูลโหลดสำเร็จ
@@ -83,20 +83,29 @@ function Dashboard() {
     const thaiMonths = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
 
     const createDataForAllMonths = (data) => {
+        if (!Array.isArray(data)) {
+            console.error("Expected data to be an array but got:", data);
+            return new Array(12).fill(0).map((_, i) => ({
+                month: i + 1,
+                count_per_month: 0,
+            }));
+        }
+    
         const monthsWithData = new Array(12).fill(0).map((_, i) => ({
             month: i + 1,
             count_per_month: 0,
         }));
-
+    
         data.forEach(item => {
             const monthIndex = item.month - 1;
             if (monthIndex >= 0 && monthIndex < 12) {
                 monthsWithData[monthIndex].count_per_month = item.count_per_month;
             }
         });
-
+    
         return monthsWithData;
     };
+    
 
     const allMonthsAgeData = createDataForAllMonths(ageData);
     const allMonthsSimilarityData = createDataForAllMonths(similarityData);

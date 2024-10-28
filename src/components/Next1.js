@@ -35,7 +35,7 @@ export default function Next1() {
     }
 
     try {
-      const response = await fetch(`${baseUrl}/predict`, {
+      const response = await fetch(`${baseUrl}/ai/predict`, {
         method: 'POST',
         body: formData,
       });
@@ -70,7 +70,7 @@ export default function Next1() {
     }
 
     try {
-      const response = await fetch(`${baseUrl}/predict/age`, {
+      const response = await fetch(`${baseUrl}/ai/predict/age`, {
         method: 'POST',
         body: formData,
       });

@@ -24,7 +24,7 @@ export default function SigninAdmin() {
     e.preventDefault();
 
     try {
-      const response = await axios.post(`${baseURL}/login`, {
+      const response = await axios.post(`${baseURL}/api/login`, {
         username,
         password
       });
