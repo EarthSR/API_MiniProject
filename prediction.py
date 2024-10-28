@@ -34,7 +34,7 @@ db = mysql.connector.connect(
 )
 
 # Route to handle image predictions
-@app.route('/predict', methods=['POST'])
+@app.route('/ai/predict', methods=['POST'])
 def predict():
     if 'image' not in request.files:
         return jsonify({"error": "No image file provided"}), 400
@@ -99,7 +99,7 @@ def predict():
 
 
 # API endpoint to predict age
-@app.route('/predict/age', methods=['POST'])
+@app.route('/ai/predict/age', methods=['POST'])
 def predict_age():
     if 'image' not in request.files:
         return jsonify({'error': 'No image provided'}), 400
